@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+motor
+groq
+passlib[bcrypt]
+python-jose[cryptography]
+pydantic
+pdfplumber
+python-multipart
