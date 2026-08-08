@@ -6,3 +6,8 @@ build/
 .vscode/
 .DS_Store
 coverage/
+backend/.env
+frontend/dist/
+__pycache__/
+*.pyc
+venv/

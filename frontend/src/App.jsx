@@ -1,10 +1,26 @@
 import { useState, useEffect, useRef } from "react"
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
-import logo from "./assets/logo.png";
-// ── API ───────────────────────────────────────────
+import * as faceapi from "face-api.js"
+import logo from "./assets/logo.png"
+import NewHomePage from './pages/HomePage'
+import NewNavBar from './components/NavBar'
+import RelaxPage    from './pages/RelaxPage'
+import BreathingPage from './pages/BreathingPage'
+import KolamPage    from './pages/KolamPage'
+import ScribblePage from './pages/ScribblePage'
+import BubblePage   from './pages/BubblePage'
+import MusicPage    from './pages/MusicPage'
+import FocusPage    from './pages/FocusPage'
+import SchedulerPage from './pages/SchedulerPage'
+import GradesPage   from './pages/GradesPage'
+import PomodoroPage from './pages/PomodoroPage'
+import SupportPage  from './pages/SupportPage'
+import LibraryPage  from './pages/LibraryPage'
+import StoriesPage  from './pages/StoriesPage'
+import HavenTreePage from './pages/HavenTreePage'
+
 const API = "http://localhost:8000"
 
-// ── Quotes ────────────────────────────────────────
 const QUOTES = [
   "🌿 Every feeling is valid.",
   "✨ Small steps count.",
@@ -17,47 +33,20 @@ const QUOTES = [
   "🌊 Emotions are waves — they rise and fall.",
 ]
 
-// ── Mood Ambience (links UI feel to user's mood) ──
 const AMBIENCE = {
-  1: { // Very Low — warm, cozy, uplifting
-    bg: "radial-gradient(ellipse at 60% 0%, #ffe8d6 0%, #ffd6e7 40%, #f0e6ff 100%)",
-    particle: "🌸",
-    accent: "#e07060",
-    message: "Wrapping you in warmth 🌸",
-  },
-  2: { // Low — soft sunrise, hopeful
-    bg: "radial-gradient(ellipse at 80% 10%, #fff3e0 0%, #ffe0b2 30%, #f3e5f5 100%)",
-    particle: "🌤️",
-    accent: "#d09060",
-    message: "The sun is still there 🌤️",
-  },
-  3: { // Neutral — calm lavender
-    bg: "radial-gradient(ellipse at 50% 0%, #f0eeff 0%, #e8f4ff 50%, #f8f7ff 100%)",
-    particle: "✦",
-    accent: "#7c6fff",
-    message: "A steady, peaceful moment ✦",
-  },
-  4: { // Good — fresh greens
-    bg: "radial-gradient(ellipse at 30% 0%, #e8f5e9 0%, #f0fff4 40%, #e8f4ff 100%)",
-    particle: "🌿",
-    accent: "#5a9e6f",
-    message: "Something's blooming 🌿",
-  },
-  5: { // Great — golden sunshine
-    bg: "radial-gradient(ellipse at 50% 0%, #fff8e1 0%, #fffde7 40%, #f0fff4 100%)",
-    particle: "✨",
-    accent: "#c9a227",
-    message: "You're glowing today ✨",
-  },
+  1: { bg: "radial-gradient(ellipse at 60% 0%, #ffe8d6 0%, #ffd6e7 40%, #f0e6ff 100%)", particle: "🌸", accent: "#e07060", message: "Wrapping you in warmth 🌸" },
+  2: { bg: "radial-gradient(ellipse at 80% 10%, #fff3e0 0%, #ffe0b2 30%, #f3e5f5 100%)", particle: "🌤️", accent: "#d09060", message: "The sun is still there 🌤️" },
+  3: { bg: "radial-gradient(ellipse at 50% 0%, #f0eeff 0%, #e8f4ff 50%, #f8f7ff 100%)", particle: "✦", accent: "#7c6fff", message: "A steady, peaceful moment ✦" },
+  4: { bg: "radial-gradient(ellipse at 30% 0%, #e8f5e9 0%, #f0fff4 40%, #e8f4ff 100%)", particle: "🌿", accent: "#5a9e6f", message: "Something's blooming 🌿" },
+  5: { bg: "radial-gradient(ellipse at 50% 0%, #fff8e1 0%, #fffde7 40%, #f0fff4 100%)", particle: "✨", accent: "#c9a227", message: "You're glowing today ✨" },
 }
 
-// ── Time of Day ambience for landing ─────────────
 const TIME_AMBIENCE = {
-  night:   { bg: "radial-gradient(ellipse at 50% 0%, #1a1040 0%, #0d0826 50%, #160d2e 100%)", stars: true,  label: "night" },
-  dawn:    { bg: "radial-gradient(ellipse at 40% 0%, #ff9a6c 0%, #ffd194 30%, #1a1040 100%)", stars: false, label: "dawn"  },
-  morning: { bg: "radial-gradient(ellipse at 60% 0%, #87ceeb 0%, #b8e4f9 40%, #e8f4ff 100%)", stars: false, label: "morning" },
-  noon:    { bg: "radial-gradient(ellipse at 50% 0%, #ffd700 0%, #fff8dc 30%, #e8f9ff 100%)", stars: false, label: "noon" },
-  evening: { bg: "radial-gradient(ellipse at 30% 0%, #ff7043 0%, #ff8a65 30%, #ce93d8 60%, #1a0533 100%)", stars: true, label: "evening" },
+  night:   { bg: "radial-gradient(ellipse at 50% 0%, #1a1040 0%, #0d0826 50%, #160d2e 100%)", stars: true },
+  dawn:    { bg: "radial-gradient(ellipse at 40% 0%, #ff9a6c 0%, #ffd194 30%, #1a1040 100%)", stars: false },
+  morning: { bg: "radial-gradient(ellipse at 60% 0%, #87ceeb 0%, #b8e4f9 40%, #e8f4ff 100%)", stars: false },
+  noon:    { bg: "radial-gradient(ellipse at 50% 0%, #ffd700 0%, #fff8dc 30%, #e8f9ff 100%)", stars: false },
+  evening: { bg: "radial-gradient(ellipse at 30% 0%, #ff7043 0%, #ff8a65 30%, #ce93d8 60%, #1a0533 100%)", stars: true },
 }
 
 function getTimeOfDay() {
@@ -72,10 +61,10 @@ function getTimeOfDay() {
 
 function getGreeting(t) {
   const h = new Date().getHours()
-  if (h >= 5  && h < 12) return { text: t.goodMorning, emoji: "🌤️" }
+  if (h >= 5  && h < 12) return { text: t.goodMorning,   emoji: "🌤️" }
   if (h >= 12 && h < 17) return { text: t.goodAfternoon, emoji: "☀️" }
-  if (h >= 17 && h < 21) return { text: t.goodEvening, emoji: "🌙" }
-  if (h >= 21)            return { text: t.goodNight, emoji: "🌟" }
+  if (h >= 17 && h < 21) return { text: t.goodEvening,   emoji: "🌙" }
+  if (h >= 21)            return { text: t.goodNight,     emoji: "🌟" }
   return { text: t.nightOwl, emoji: "🦉" }
 }
 
@@ -83,7 +72,6 @@ function getRandomQuote() {
   return QUOTES[Math.floor(Math.random() * QUOTES.length)]
 }
 
-// ── Hand-drawn SVG Mood Faces ─────────────────────
 const MOOD_FACES = {
   1: (size = 32) => (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
@@ -143,7 +131,6 @@ const MOOD_CONFIG = [
   { label: "Great",    color: "#c9a227", bg: "#fff8e1" },
 ]
 
-// ── Languages ─────────────────────────────────────
 const LANGUAGES = [
   { code: "English",   label: "English",   native: "English"   },
   { code: "Tamil",     label: "Tamil",     native: "தமிழ்"     },
@@ -153,10 +140,9 @@ const LANGUAGES = [
   { code: "Hindi",     label: "Hindi",     native: "हिंदी"     },
 ]
 
-// ── Translations ──────────────────────────────────
 const T = {
   English: {
-    tagline: "your safe space to breathe",
+    tagline: "your haven of healing",
     login: "Login", signup: "Create account",
     nickname: "Nickname (3–20 characters)",
     password: "Password", passwordHint: "Password (min 6 characters)",
@@ -169,7 +155,7 @@ const T = {
     checkInSaved: "Check-in saved!",
     youreDoingGreat: "You're doing great by showing up for yourself.",
     backHome: "Back to home", backToHome: "Back to home",
-    talkToEloria: "💬 Talk to Eloria",
+    talkToEloria: "💜 Talk to Eloria",
     goodMorning: "Good morning", goodAfternoon: "Good afternoon",
     goodEvening: "Good evening", goodNight: "Good night",
     nightOwl: "Hey, night owl",
@@ -184,9 +170,9 @@ const T = {
     getReflection: "Get reflection 💜", writeAnother: "Write another entry",
     noticedLow: "I've noticed you've been feeling low lately.",
     gentleSuggestion: "Would you like to try something gentle?",
-    breathe: "🌬️ Breathe", journal: "Journal", talk: "💬 Talk",
+    breathe: "🌬️ Breathe", journal: "Journal", talk: "💜 Talk",
     moodHistory: "Your mood history", noCheckins: "No check-ins yet!",
-    weeklyAvg: "7-day average", monthlyAvg: "30-day average",
+    weeklyAvg: "7-day", monthlyAvg: "30-day",
     moodOverTime: "Mood over time", moodBreakdown: "Mood breakdown",
     insights: "Insights", logout: "Logout",
     chatGreeting: "Hi! I'm Eloria 💜 I'm here to listen. How are you feeling today?",
@@ -198,7 +184,7 @@ const T = {
     selectLanguage: "Language",
   },
   Tamil: {
-    tagline: "உங்கள் பாதுகாப்பான இடம்",
+    tagline: "உங்கள் குணமடையும் இடம்",
     login: "உள்நுழை", signup: "கணக்கு உருவாக்கு",
     nickname: "புனைப்பெயர் (3–20 எழுத்துகள்)",
     password: "கடவுச்சொல்", passwordHint: "கடவுச்சொல் (குறைந்தது 6 எழுத்துகள்)",
@@ -210,7 +196,7 @@ const T = {
     saveCheckin: "சேமி", checkInSaved: "பதிவு சேமிக்கப்பட்டது!",
     youreDoingGreat: "நீங்கள் சிறப்பாக செய்கிறீர்கள்.",
     backHome: "முகப்புக்கு திரும்பு", backToHome: "முகப்புக்கு திரும்பு",
-    talkToEloria: "💬 Eloria உடன் பேசு",
+    talkToEloria: "💜 Eloria உடன் பேசு",
     goodMorning: "காலை வணக்கம்", goodAfternoon: "மதிய வணக்கம்",
     goodEvening: "மாலை வணக்கம்", goodNight: "இரவு வணக்கம்",
     nightOwl: "வணக்கம்",
@@ -225,9 +211,9 @@ const T = {
     getReflection: "பிரதிபலிப்பு பெறு 💜", writeAnother: "மற்றொரு பதிவு எழுது",
     noticedLow: "நீங்கள் சில நாட்களாக சோர்வாக உணர்கிறீர்கள்.",
     gentleSuggestion: "ஏதாவது மென்மையான முயற்சி செய்ய விரும்புகிறீர்களா?",
-    breathe: "🌬️ மூச்சு", journal: "நாட்குறிப்பு", talk: "💬 பேசு",
+    breathe: "🌬️ மூச்சு", journal: "நாட்குறிப்பு", talk: "💜 பேசு",
     moodHistory: "உங்கள் மனநிலை வரலாறு", noCheckins: "இன்னும் பதிவுகள் இல்லை!",
-    weeklyAvg: "7-நாள் சராசரி", monthlyAvg: "30-நாள் சராசரி",
+    weeklyAvg: "7-நாள்", monthlyAvg: "30-நாள்",
     moodOverTime: "காலப்போக்கில் மனநிலை", moodBreakdown: "மனநிலை பிரிவு",
     insights: "நுண்ணறிவுகள்", logout: "வெளியேறு",
     chatGreeting: "வணக்கம்! நான் Eloria 💜 இன்று நீங்கள் எப்படி உணர்கிறீர்கள்?",
@@ -239,7 +225,7 @@ const T = {
     selectLanguage: "மொழி",
   },
   Telugu: {
-    tagline: "మీ సురక్షిత స్థలం",
+    tagline: "మీ స్వస్థత స్థలం",
     login: "లాగిన్", signup: "ఖాతా సృష్టించు",
     nickname: "మారుపేరు (3–20 అక్షరాలు)",
     password: "పాస్‌వర్డ్", passwordHint: "పాస్‌వర్డ్ (కనీసం 6 అక్షరాలు)",
@@ -251,7 +237,7 @@ const T = {
     saveCheckin: "సేవ్ చేయి", checkInSaved: "చెక్-ఇన్ సేవ్ అయింది!",
     youreDoingGreat: "మీరు చాలా బాగా చేస్తున్నారు.",
     backHome: "హోమ్‌కు వెళ్ళు", backToHome: "హోమ్‌కు వెళ్ళు",
-    talkToEloria: "💬 Eloria తో మాట్లాడు",
+    talkToEloria: "💜 Eloria తో మాట్లాడు",
     goodMorning: "శుభోదయం", goodAfternoon: "శుభ మధ్యాహ్నం",
     goodEvening: "శుభ సాయంత్రం", goodNight: "శుభ రాత్రి",
     nightOwl: "హలో",
@@ -266,9 +252,9 @@ const T = {
     getReflection: "రిఫ్లెక్షన్ పొందు 💜", writeAnother: "మరొక నమోదు రాయి",
     noticedLow: "మీరు కొన్ని రోజులుగా తక్కువగా అనుభవిస్తున్నారు.",
     gentleSuggestion: "మెత్తగా ఏదైనా ప్రయత్నించాలనుకుంటున్నారా?",
-    breathe: "🌬️ శ్వాస", journal: "జర్నల్", talk: "💬 మాట్లాడు",
+    breathe: "🌬️ శ్వాస", journal: "జర్నల్", talk: "💜 మాట్లాడు",
     moodHistory: "మీ మూడ్ చరిత్ర", noCheckins: "ఇంకా నమోదులు లేవు!",
-    weeklyAvg: "7-రోజుల సగటు", monthlyAvg: "30-రోజుల సగటు",
+    weeklyAvg: "7-రోజులు", monthlyAvg: "30-రోజులు",
     moodOverTime: "కాలక్రమేణా మూడ్", moodBreakdown: "మూడ్ విభజన",
     insights: "అంతర్దృష్టులు", logout: "లాగ్అవుట్",
     chatGreeting: "నమస్కారం! నేను Eloria 💜 ఈరోజు మీరు ఎలా అనుభవిస్తున్నారు?",
@@ -280,7 +266,7 @@ const T = {
     selectLanguage: "భాష",
   },
   Malayalam: {
-    tagline: "നിങ്ങളുടെ സുരക്ഷിത ഇടം",
+    tagline: "നിങ്ങളുടെ സൗഖ്യത്തിന്റെ ഇടം",
     login: "ലോഗിൻ", signup: "അക്കൗണ്ട് ഉണ്ടാക്കൂ",
     nickname: "വിളിപ്പേര് (3–20 അക്ഷരങ്ങൾ)",
     password: "പാസ്‌വേഡ്", passwordHint: "പാസ്‌വേഡ് (കുറഞ്ഞത് 6 അക്ഷരങ്ങൾ)",
@@ -292,7 +278,7 @@ const T = {
     saveCheckin: "സേവ് ചെയ്യൂ", checkInSaved: "ചെക്ക്-ഇൻ സേവ് ആയി!",
     youreDoingGreat: "നിങ്ങൾ വളരെ നന്നായി ചെയ്യുന്നു.",
     backHome: "ഹോമിലേക്ക് മടങ്ങൂ", backToHome: "ഹോമിലേക്ക് മടങ്ങൂ",
-    talkToEloria: "💬 Eloria-മായി സംസാരിക്കൂ",
+    talkToEloria: "💜 Eloria-മായി സംസാരിക്കൂ",
     goodMorning: "സുപ്രഭാതം", goodAfternoon: "ഉച്ച വന്ദനം",
     goodEvening: "സന്ധ്യാ വന്ദനം", goodNight: "ശുഭ രാത്രി",
     nightOwl: "ഹലോ",
@@ -307,9 +293,9 @@ const T = {
     getReflection: "റിഫ്ലക്ഷൻ നേടൂ 💜", writeAnother: "മറ്റൊരു എൻട്രി എഴുതൂ",
     noticedLow: "നിങ്ങൾ കുറച്ച് ദിവസങ്ങളായി തളർന്നു കാണുന്നു.",
     gentleSuggestion: "എന്തെങ്കിലും മൃദുവായി പരീക്ഷിക്കാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?",
-    breathe: "🌬️ ശ്വാസം", journal: "ജേർണൽ", talk: "💬 സംസാരിക്കൂ",
+    breathe: "🌬️ ശ്വാസം", journal: "ജേർണൽ", talk: "💜 സംസാരിക്കൂ",
     moodHistory: "നിങ്ങളുടെ മൂഡ് ചരിത്രം", noCheckins: "ഇതുവരെ ചെക്ക്-ഇന്നുകൾ ഇല്ല!",
-    weeklyAvg: "7-ദിവസ ശരാശരി", monthlyAvg: "30-ദിവസ ശരാശരി",
+    weeklyAvg: "7-ദിവസം", monthlyAvg: "30-ദിവസം",
     moodOverTime: "സമയക്രമത്തിൽ മൂഡ്", moodBreakdown: "മൂഡ് വിഭജനം",
     insights: "ഉൾക്കാഴ്ചകൾ", logout: "ലോഗ്ഔട്ട്",
     chatGreeting: "നമസ്കാരം! ഞാൻ Eloria 💜 ഇന്ന് നിങ്ങൾക്ക് എങ്ങനെ തോന്നുന്നു?",
@@ -321,7 +307,7 @@ const T = {
     selectLanguage: "ഭാഷ",
   },
   Kannada: {
-    tagline: "ನಿಮ್ಮ ಸುರಕ್ಷಿತ ಸ್ಥಳ",
+    tagline: "ನಿಮ್ಮ ಗುಣಮುಖದ ಸ್ಥಳ",
     login: "ಲಾಗಿನ್", signup: "ಖಾತೆ ರಚಿಸಿ",
     nickname: "ಅಡ್ಡಹೆಸರು (3–20 ಅಕ್ಷರಗಳು)",
     password: "ಪಾಸ್‌ವರ್ಡ್", passwordHint: "ಪಾಸ್‌ವರ್ಡ್ (ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳು)",
@@ -333,7 +319,7 @@ const T = {
     saveCheckin: "ಉಳಿಸಿ", checkInSaved: "ಚೆಕ್-ಇನ್ ಉಳಿಸಲಾಗಿದೆ!",
     youreDoingGreat: "ನೀವು ತುಂಬಾ ಚೆನ್ನಾಗಿ ಮಾಡುತ್ತಿದ್ದೀರಿ.",
     backHome: "ಮನೆಗೆ ಹಿಂತಿರುಗಿ", backToHome: "ಮನೆಗೆ ಹಿಂತಿರುಗಿ",
-    talkToEloria: "💬 Eloria ನೊಂದಿಗೆ ಮಾತನಾಡಿ",
+    talkToEloria: "💜 Eloria ನೊಂದಿಗೆ ಮಾತನಾಡಿ",
     goodMorning: "ಶುಭೋದಯ", goodAfternoon: "ಶುಭ ಮಧ್ಯಾಹ್ನ",
     goodEvening: "ಶುಭ ಸಂಜೆ", goodNight: "ಶುಭ ರಾತ್ರಿ",
     nightOwl: "ಹಲೋ",
@@ -348,9 +334,9 @@ const T = {
     getReflection: "ಪ್ರತಿಫಲನ ಪಡೆಯಿರಿ 💜", writeAnother: "ಮತ್ತೊಂದು ನಮೂದು ಬರೆಯಿರಿ",
     noticedLow: "ನೀವು ಕೆಲವು ದಿನಗಳಿಂದ ಕಡಿಮೆ ಅನುಭವಿಸುತ್ತಿದ್ದೀರಿ.",
     gentleSuggestion: "ಏನಾದರೂ ಮೃದುವಾಗಿ ಪ್ರಯತ್ನಿಸಲು ಬಯಸುತ್ತೀರಾ?",
-    breathe: "🌬️ ಉಸಿರು", journal: "ಜರ್ನಲ್", talk: "💬 ಮಾತನಾಡಿ",
+    breathe: "🌬️ ಉಸಿರು", journal: "ಜರ್ನಲ್", talk: "💜 ಮಾತನಾಡಿ",
     moodHistory: "ನಿಮ್ಮ ಮನಸ್ಥಿತಿ ಇತಿಹಾಸ", noCheckins: "ಇನ್ನೂ ಚೆಕ್-ಇನ್‌ಗಳಿಲ್ಲ!",
-    weeklyAvg: "7-ದಿನ ಸರಾಸರಿ", monthlyAvg: "30-ದಿನ ಸರಾಸರಿ",
+    weeklyAvg: "7-ದಿನ", monthlyAvg: "30-ದಿನ",
     moodOverTime: "ಕಾಲಾನಂತರದಲ್ಲಿ ಮನಸ್ಥಿತಿ", moodBreakdown: "ಮನಸ್ಥಿತಿ ವಿಭಜನೆ",
     insights: "ಒಳನೋಟಗಳು", logout: "ಲಾಗ್‌ಔಟ್",
     chatGreeting: "ನಮಸ್ಕಾರ! ನಾನು Eloria 💜 ಇಂದು ನೀವು ಹೇಗೆ ಅನುಭವಿಸುತ್ತಿದ್ದೀರಿ?",
@@ -362,7 +348,7 @@ const T = {
     selectLanguage: "ಭಾಷೆ",
   },
   Hindi: {
-    tagline: "आपकी सुरक्षित जगह",
+    tagline: "आपका उपचार का ठिकाना",
     login: "लॉगिन", signup: "खाता बनाएं",
     nickname: "उपनाम (3–20 अक्षर)",
     password: "पासवर्ड", passwordHint: "पासवर्ड (कम से कम 6 अक्षर)",
@@ -374,7 +360,7 @@ const T = {
     saveCheckin: "सहेजें", checkInSaved: "चेक-इन सहेजा गया!",
     youreDoingGreat: "आप बहुत अच्छा कर रहे हैं।",
     backHome: "होम पर वापस जाएं", backToHome: "होम पर वापस जाएं",
-    talkToEloria: "💬 Eloria से बात करें",
+    talkToEloria: "💜 Eloria से बात करें",
     goodMorning: "सुप्रभात", goodAfternoon: "नमस्ते",
     goodEvening: "शुभ संध्या", goodNight: "शुभ रात्रि",
     nightOwl: "हेलो",
@@ -389,9 +375,9 @@ const T = {
     getReflection: "प्रतिबिंब पाएं 💜", writeAnother: "एक और लिखें",
     noticedLow: "मैंने देखा है कि आप कुछ दिनों से उदास हैं।",
     gentleSuggestion: "क्या आप कुछ हल्का आजमाना चाहेंगे?",
-    breathe: "🌬️ सांस लें", journal: "जर्नल", talk: "💬 बात करें",
+    breathe: "🌬️ सांस लें", journal: "जर्नल", talk: "💜 बात करें",
     moodHistory: "आपका मूड इतिहास", noCheckins: "अभी तक कोई चेक-इन नहीं!",
-    weeklyAvg: "7-दिन औसत", monthlyAvg: "30-दिन औसत",
+    weeklyAvg: "7-दिन", monthlyAvg: "30-दिन",
     moodOverTime: "समय के साथ मूड", moodBreakdown: "मूड विभाजन",
     insights: "अंतर्दृष्टि", logout: "लॉगआउट",
     chatGreeting: "नमस्ते! मैं Eloria हूं 💜 आज आप कैसा महसूस कर रहे हैं?",
@@ -404,7 +390,6 @@ const T = {
   },
 }
 
-// ── Helper Data ───────────────────────────────────
 const HELPLINES = [
   { name: "iCall", number: "9152987821", desc: "TISS counselling helpline", type: "📞" },
   { name: "Vandrevala Foundation", number: "1860-2662-345", desc: "24/7 mental health support", type: "📞" },
@@ -415,9 +400,9 @@ const HELPLINES = [
 ]
 
 const NGOS = [
-  { name: "The Live Love Laugh Foundation", url: "thelivelovelaughfoundation.org", desc: "Mental health awareness by Deepika Padukone" },
+  { name: "The Live Love Laugh Foundation", url: "thelivelovelaughfoundation.org", desc: "Mental health awareness" },
   { name: "Sangath", url: "sangath.in", desc: "Free mental health resources & community care" },
-  { name: "White Swan Foundation", url: "whitswanfoundation.org", desc: "Information on mental health conditions" },
+  { name: "White Swan Foundation", url: "whiteswanfoundation.org", desc: "Information on mental health conditions" },
   { name: "iCall", url: "icallhelpline.org", desc: "Online & telephone counselling by TISS" },
 ]
 
@@ -430,7 +415,6 @@ const BOOKS = [
   { title: "Maybe You Should Talk to Someone", author: "Lori Gottlieb", emoji: "📔" },
 ]
 
-// ── Hooks ─────────────────────────────────────────
 function useApi() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -443,7 +427,6 @@ function useApi() {
   return { loading, error, call, setError }
 }
 
-// ── Shared Components ─────────────────────────────
 function ErrorBanner({ message, onClose }) {
   if (!message) return null
   return (
@@ -462,28 +445,6 @@ function Spinner() {
   )
 }
 
-// ── Floating particles for ambience ──────────────
-function Particles({ symbol, count = 6, dark }) {
-  return (
-    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} style={{
-          position: "absolute",
-          left: `${10 + i * 16}%`,
-          top: `${-10 - i * 5}%`,
-          fontSize: i % 2 === 0 ? 14 : 10,
-          opacity: dark ? 0.15 : 0.25,
-          animation: `floatDown ${6 + i * 1.5}s linear ${i * 0.8}s infinite`,
-          color: dark ? "#c8c0ff" : "inherit",
-        }}>
-          {symbol}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// Stars for night ambience
 function Stars() {
   return (
     <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
@@ -504,57 +465,28 @@ function Stars() {
   )
 }
 
-// ── Logo ──────────────────────────────────────────
 function Logo({ size = "sm" }) {
-  const s = size === "lg" ? 44 : 28
-  const r = size === "lg" ? 14 : 9
-  const fs = size === "lg" ? 22 : 14
+  const lg = size === "lg"
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <img
-        src={logo}
-        alt="EloriaHaven Logo"
-        style={{
-          width: 48,
-          height: 48,
-          objectFit: "contain",
-          flexShrink: 0,
-        }}
-      />
-      <span style={{ fontSize: size === "lg" ? 20 : 14, fontWeight: 600, color: "var(--primary)", letterSpacing: "-0.01em" }}>EloriaHaven</span>
+      <img src={logo} alt="EloriaHaven Logo" style={{ width: lg ? 44 : 32, height: lg ? 44 : 32, objectFit: "contain", flexShrink: 0 }} />
+      <span style={{ fontSize: lg ? 20 : 14, fontWeight: 600, color: "var(--primary)", letterSpacing: "-0.01em" }}>EloriaHaven</span>
     </div>
   )
 }
 
-// ── Language Dropdown ─────────────────────────────
 function LangDropdown({ lang, onLangChange, t }) {
   const [open, setOpen] = useState(false)
   const current = LANGUAGES.find(l => l.code === lang)
   return (
     <div style={{ position: "relative" }}>
-      <button onClick={() => setOpen(o => !o)} style={{
-        background: "var(--bg-card)", border: "0.5px solid var(--border)",
-        borderRadius: 20, padding: "5px 12px", fontSize: 12,
-        color: "var(--text-sub)", cursor: "pointer", fontFamily: "var(--font)",
-        display: "flex", alignItems: "center", gap: 6,
-      }}>
+      <button onClick={() => setOpen(o => !o)} style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)", borderRadius: 20, padding: "5px 12px", fontSize: 12, color: "var(--text-sub)", cursor: "pointer", fontFamily: "var(--font)", display: "flex", alignItems: "center", gap: 6 }}>
         🌐 {current?.native} ▾
       </button>
       {open && (
-        <div style={{
-          position: "absolute", top: "calc(100% + 6px)", right: 0,
-          background: "var(--bg-card)", border: "0.5px solid var(--border)",
-          borderRadius: 12, overflow: "hidden", zIndex: 500,
-          boxShadow: "0 8px 24px rgba(0,0,0,0.12)", minWidth: 160,
-        }}>
+        <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "var(--bg-card)", border: "0.5px solid var(--border)", borderRadius: 12, overflow: "hidden", zIndex: 500, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", minWidth: 160 }}>
           {LANGUAGES.map(l => (
-            <div key={l.code} onClick={() => { onLangChange(l.code); setOpen(false) }} style={{
-              padding: "10px 16px", fontSize: 13, cursor: "pointer",
-              color: lang === l.code ? "var(--primary)" : "var(--text)",
-              background: lang === l.code ? "var(--bg-quote)" : "transparent",
-              transition: "background 0.15s",
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-            }}>
+            <div key={l.code} onClick={() => { onLangChange(l.code); setOpen(false) }} style={{ padding: "10px 16px", fontSize: 13, cursor: "pointer", color: lang === l.code ? "var(--primary)" : "var(--text)", background: lang === l.code ? "var(--bg-quote)" : "transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span>{l.label}</span>
               <span style={{ opacity: 0.6, fontSize: 12 }}>{l.native}</span>
             </div>
@@ -565,7 +497,6 @@ function LangDropdown({ lang, onLangChange, t }) {
   )
 }
 
-// ── Theme Toggle ──────────────────────────────────
 function ThemeToggle({ dark, onToggle }) {
   return (
     <button onClick={onToggle} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, padding: 4 }} aria-label="Toggle theme">
@@ -574,57 +505,40 @@ function ThemeToggle({ dark, onToggle }) {
   )
 }
 
-// ── Helper Panel ──────────────────────────────────
 function HelperPanel({ onClose, t }) {
   const [tab, setTab] = useState("helplines")
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 1000,
-      background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "flex-end",
-    }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{
-        background: "var(--bg)", borderRadius: "20px 20px 0 0",
-        width: "100%", maxWidth: 420, margin: "0 auto",
-        padding: "20px 20px 32px", maxHeight: "80vh", overflowY: "auto",
-        animation: "slideUp 0.3s cubic-bezier(.4,0,.2,1)",
-      }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "flex-end" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "var(--bg)", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 420, margin: "0 auto", padding: "20px 20px 32px", maxHeight: "80vh", overflowY: "auto", animation: "slideUp 0.3s cubic-bezier(.4,0,.2,1)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div style={{ fontSize: 16, fontWeight: 500, color: "var(--text)" }}>🆘 {t.soulmateHelper}</div>
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-sub)" }}>✕</button>
         </div>
-
+        <div style={{ fontSize: 11, color: "var(--text-sub)", background: "var(--bg-quote)", borderRadius: 8, padding: "8px 12px", marginBottom: 14 }}>
+          🔒 Your data is never used to train AI models.
+        </div>
         <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
           {["helplines", "ngos", "books"].map(tab_ => (
-            <button key={tab_} onClick={() => setTab(tab_)} style={{
-              padding: "6px 14px", borderRadius: 20, fontSize: 12, border: "0.5px solid",
-              borderColor: tab === tab_ ? "var(--primary)" : "var(--border)",
-              background: tab === tab_ ? "var(--bg-quote)" : "transparent",
-              color: tab === tab_ ? "var(--primary)" : "var(--text-sub)",
-              cursor: "pointer", fontFamily: "var(--font)",
-            }}>
+            <button key={tab_} onClick={() => setTab(tab_)} style={{ flex: 1, padding: "6px 4px", borderRadius: 20, fontSize: 11, border: "0.5px solid", borderColor: tab === tab_ ? "var(--primary)" : "var(--border)", background: tab === tab_ ? "var(--bg-quote)" : "transparent", color: tab === tab_ ? "var(--primary)" : "var(--text-sub)", cursor: "pointer", fontFamily: "var(--font)" }}>
               {tab_ === "helplines" ? "📞 Helplines" : tab_ === "ngos" ? "🤝 NGOs" : "📚 Books"}
             </button>
           ))}
         </div>
-
         {tab === "helplines" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ fontSize: 11, color: "var(--text-sub)", marginBottom: 4 }}>Real, verified Indian helplines. You are not alone. 💜</div>
             {HELPLINES.map((h, i) => (
               <div key={i} style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)", borderRadius: 12, padding: "12px 14px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>{h.name}</div>
-                    <div style={{ fontSize: 11, color: "var(--text-sub)" }}>{h.desc}</div>
-                  </div>
-                  <div style={{ fontSize: 13, color: "var(--primary)", fontWeight: 500 }}>{h.type} {h.number}</div>
-                </div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>{h.name}</div>
+                <div style={{ fontSize: 11, color: "var(--text-sub)", marginBottom: 6 }}>{h.desc}</div>
+                <div style={{ fontSize: 13, color: "var(--primary)", fontWeight: 500 }}>{h.type} {h.number}</div>
               </div>
             ))}
           </div>
         )}
-
         {tab === "ngos" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ fontSize: 11, color: "var(--text-sub)", marginBottom: 4 }}>Organisations offering free or affordable support. 🤝</div>
             {NGOS.map((n, i) => (
               <div key={i} style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>🤝 {n.name}</div>
@@ -634,9 +548,9 @@ function HelperPanel({ onClose, t }) {
             ))}
           </div>
         )}
-
         {tab === "books" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ fontSize: 11, color: "var(--text-sub)", marginBottom: 4 }}>Hand-picked books for mental wellbeing. 📚</div>
             {BOOKS.map((b, i) => (
               <div key={i} style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)", borderRadius: 12, padding: "12px 14px", display: "flex", gap: 12, alignItems: "center" }}>
                 <span style={{ fontSize: 24 }}>{b.emoji}</span>
@@ -653,27 +567,23 @@ function HelperPanel({ onClose, t }) {
   )
 }
 
-// ── Onboarding ────────────────────────────────────
 function OnboardPage({ onDone }) {
   const [step, setStep] = useState(0)
   const tod = getTimeOfDay()
   const ta = TIME_AMBIENCE[tod]
   const steps = [
-    { icon: "💜", title: "Welcome to Eloria", body: "A safe, private space to check in with yourself every day." },
-    { icon: "🧠", title: "Track your mood", body: "Log how you feel in seconds. No real name, no judgment — just you." },
-    { icon: "💬", title: "Talk it out", body: "Chat with an empathetic AI companion whenever you need to be heard." },
+    { icon: "💜", title: "Welcome to EloriaHaven", body: "A safe, private place to heal, reflect and feel heard — every day." },
+    { icon: "🌿", title: "Meet Eloria", body: "Your empathetic AI companion. She listens, reflects, and gently guides you — no judgement, ever." },
+    { icon: "🎋", title: "Your haven awaits", body: "Track your mood, journal your thoughts, and grow your Haven Tree as you heal." },
   ]
   const s = steps[step]
   return (
     <div style={{ minHeight: "100vh", background: ta.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", position: "relative", transition: "background 1s ease" }}>
       {ta.stars && <Stars />}
       <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 360, width: "100%" }}>
-        <div style={{ fontSize: 64, marginBottom: 24, animation: "bounceIn 0.6s cubic-bezier(.4,0,.2,1)" }}>{s.icon}</div>
+        <div style={{ fontSize: 60, marginBottom: 20, animation: "bounceIn 0.6s cubic-bezier(.4,0,.2,1)" }}>{s.icon}</div>
         <Logo size="lg" />
-        <div style={{ fontSize: 13, color: "var(--text-sub)", marginTop: 6, marginBottom: 28 }}>
-          {tod === "morning" ? "Good morning ☀️" : tod === "evening" ? "Good evening 🌙" : tod === "night" ? "Peaceful night 🌟" : tod === "noon" ? "Good afternoon ☀️" : tod === "dawn" ? "Early bird 🌅" : "Hello 👋"}
-        </div>
-        <div style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(12px)", borderRadius: 20, padding: "28px 24px", border: "0.5px solid rgba(255,255,255,0.25)", marginBottom: 24 }}>
+        <div style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(14px)", borderRadius: 20, padding: "24px 22px", border: "0.5px solid rgba(255,255,255,0.3)", marginBottom: 22, marginTop: 18 }}>
           <div style={{ fontSize: 17, fontWeight: 500, color: "var(--text)", marginBottom: 10 }}>{s.title}</div>
           <div style={{ fontSize: 14, color: "var(--text-sub)", lineHeight: 1.7 }}>{s.body}</div>
         </div>
@@ -684,15 +594,14 @@ function OnboardPage({ onDone }) {
         </div>
         {step < steps.length - 1
           ? <button className="btn btn-primary" onClick={() => setStep(s => s + 1)}>Next →</button>
-          : <button className="btn btn-primary" onClick={onDone}>Get started 💜</button>
+          : <button className="btn btn-primary" onClick={onDone}>Enter EloriaHaven 💜</button>
         }
-        <div style={{ marginTop: 16, fontSize: 12, color: "var(--text-sub)" }}>🔒 Anonymous. Private. Always.</div>
+        <div style={{ marginTop: 14, fontSize: 12, color: "var(--text-sub)" }}>🔒 Anonymous. Private. Always.</div>
       </div>
     </div>
   )
 }
 
-// ── Auth ──────────────────────────────────────────
 function AuthPage({ onLogin, t, lang, onLangChange }) {
   const [isSignup, setIsSignup] = useState(false)
   const [nickname, setNickname] = useState("")
@@ -734,7 +643,7 @@ function AuthPage({ onLogin, t, lang, onLangChange }) {
   return (
     <div style={{ minHeight: "100vh", background: ta.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", transition: "background 1s ease" }}>
       {ta.stars && <Stars />}
-      <div className="fade-up" style={{ width: "100%", maxWidth: 360, position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
+      <div className="fade-up" style={{ width: "100%", maxWidth: 360, position: "relative", zIndex: 1, background: "rgba(255,255,255,0.18)", backdropFilter: "blur(16px)", borderRadius: 20, padding: 24, border: "0.5px solid rgba(255,255,255,0.28)", display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Logo size="lg" />
           <LangDropdown lang={lang} onLangChange={onLangChange} t={t} />
@@ -742,56 +651,18 @@ function AuthPage({ onLogin, t, lang, onLangChange }) {
         <div style={{ fontSize: 13, color: "var(--text-sub)" }}>{t.tagline}</div>
         <div className="quote-card">{quote}</div>
         <ErrorBanner message={error} onClose={() => setError("")} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <input placeholder={t.nickname} value={nickname} onChange={e => setNickname(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} maxLength={20} />
           <input placeholder={isSignup ? t.passwordHint : t.password} type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
         </div>
-        <button className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
-          {loading ? <Spinner /> : isSignup ? t.signup : t.login}
-        </button>
-        <button className="btn btn-ghost" onClick={() => { setIsSignup(v => !v); setError("") }}>
-          {isSignup ? t.alreadyHave : t.newHere}
-        </button>
-        <div style={{ fontSize: 12, color: "var(--text-sub)", textAlign: "center" }}>{t.privacy}</div>
+        <button className="btn btn-primary" onClick={handleSubmit} disabled={loading}>{loading ? <Spinner /> : isSignup ? t.signup : t.login}</button>
+        <button className="btn btn-ghost" onClick={() => { setIsSignup(v => !v); setError("") }}>{isSignup ? t.alreadyHave : t.newHere}</button>
+        <div style={{ fontSize: 11, color: "var(--text-sub)", textAlign: "center" }}>{t.privacy}</div>
       </div>
     </div>
   )
 }
 
-// ── Home / Dashboard ──────────────────────────────
-function HomePage({ nickname, onNavigate, t, moodAmbience }) {
-  const greeting = getGreeting(t)
-  const quote = getRandomQuote()
-  const amb = moodAmbience ? AMBIENCE[moodAmbience] : null
-  return (
-    <div className="app fade-up pb-nav">
-      <div className="greeting-card mb-12" style={{ background: amb ? `linear-gradient(135deg, ${amb.accent}99, ${amb.accent}cc)` : "linear-gradient(135deg, #a99fff, var(--primary))" }}>
-        {amb && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", marginBottom: 4 }}>{amb.message}</div>}
-        <div className="greeting-title">{greeting.text}, {nickname} {greeting.emoji}</div>
-        <div className="greeting-sub">{t.howHasToday}</div>
-      </div>
-      <div className="quote-card mb-16">{quote}</div>
-      <div className="section-title">{t.whatWouldYouLike}</div>
-      <div className="quick-grid">
-        {[
-          { icon: "💜", label: t.checkIn, sub: t.logMood, page: "checkin" },
-          { icon: "💬", label: t.talkToMe, sub: t.hereToListen, page: "chat" },
-          { icon: "📊", label: t.myTrends, sub: t.seeMoodPatterns, page: "trends" },
-          { icon: "📋", label: t.history, sub: t.pastCheckins, page: "history" },
-          { icon: "📓", label: t.journal, sub: t.writeFreely, page: "journal" },
-        ].map(q => (
-          <div key={q.page} className="qa-card" onClick={() => onNavigate(q.page)}>
-            <div className="qa-icon">{q.icon}</div>
-            <div className="qa-label">{q.label}</div>
-            <div className="qa-sub">{q.sub}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ── Check In ──────────────────────────────────────
 function CheckInPage({ onNavigate, t, onMoodSet }) {
   const [mood, setMood] = useState(null)
   const [note, setNote] = useState("")
@@ -822,9 +693,7 @@ function CheckInPage({ onNavigate, t, onMoodSet }) {
 
   if (submitted) return (
     <div className="app fade-up" style={{ justifyContent: "center", alignItems: "center", textAlign: "center", gap: 16 }}>
-      <div style={{ animation: "bounceIn 0.5s cubic-bezier(.4,0,.2,1)" }}>
-        {MOOD_FACES[mood + 1](64)}
-      </div>
+      <div style={{ animation: "bounceIn 0.5s cubic-bezier(.4,0,.2,1)" }}>{MOOD_FACES[mood + 1](64)}</div>
       <div className="section-title" style={{ fontSize: 18 }}>{t.checkInSaved}</div>
       <div style={{ fontSize: 14, color: "var(--text-sub)", lineHeight: 1.7 }}>{t.youreDoingGreat}</div>
       {amb && <div style={{ fontSize: 13, color: amb.accent, fontStyle: "italic" }}>{amb.message}</div>}
@@ -834,10 +703,9 @@ function CheckInPage({ onNavigate, t, onMoodSet }) {
   )
 
   return (
-    <div className="app fade-up pb-nav" style={{ transition: "all 0.4s ease" }}>
+    <div className="app fade-up pb-nav">
       <div style={{ marginBottom: 20 }}><Logo /></div>
       <div className="section-title" style={{ fontSize: 18 }}>{t.howFeeling}</div>
-
       {recentLow && (
         <div className="nudge-card mb-12">
           <div className="nudge-title">💜 {t.noticedLow}</div>
@@ -849,14 +717,7 @@ function CheckInPage({ onNavigate, t, onMoodSet }) {
           </div>
         </div>
       )}
-
-      {/* Ambient message when mood selected */}
-      {amb && (
-        <div className="fade-up" style={{ fontSize: 12, color: amb.accent, fontStyle: "italic", marginBottom: 10, textAlign: "center" }}>
-          {amb.message}
-        </div>
-      )}
-
+      {amb && <div className="fade-up" style={{ fontSize: 12, color: amb.accent, fontStyle: "italic", marginBottom: 10, textAlign: "center" }}>{amb.message}</div>}
       <div className="mood-grid">
         {MOOD_CONFIG.map((m, i) => (
           <div key={i} className={`mood-opt ${mood === i ? "selected" : ""}`}
@@ -869,7 +730,6 @@ function CheckInPage({ onNavigate, t, onMoodSet }) {
           </div>
         ))}
       </div>
-
       <textarea placeholder={t.whatsOnMind} value={note} onChange={e => setNote(e.target.value)} rows={4} style={{ marginTop: 8, marginBottom: 16, resize: "none" }} />
       <button className="btn btn-primary" onClick={handleSubmit} disabled={mood === null} style={{ opacity: mood === null ? 0.5 : 1, background: amb ? `linear-gradient(135deg, ${amb.accent}cc, ${amb.accent})` : undefined, transition: "background 0.4s" }}>
         {t.saveCheckin}
@@ -878,7 +738,6 @@ function CheckInPage({ onNavigate, t, onMoodSet }) {
   )
 }
 
-// ── History ───────────────────────────────────────
 function HistoryPage({ t }) {
   const [checkins, setCheckins] = useState([])
   useEffect(() => {
@@ -910,11 +769,8 @@ function HistoryPage({ t }) {
   )
 }
 
-// ── Chat ──────────────────────────────────────────
 function ChatPage({ t, lang }) {
-  const [messages, setMessages] = useState([
-    { role: "assistant", text: t.chatGreeting }
-  ])
+  const [messages, setMessages] = useState([{ role: "assistant", text: t.chatGreeting }])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const [sessionSaved, setSessionSaved] = useState(false)
@@ -963,17 +819,12 @@ function ChatPage({ t, lang }) {
                 🆘 You're not alone. Help is always available.
               </div>
             )}
-            <div className={m.role === "user" ? "bubble-user" : "bubble-ai"}
-              style={{ alignSelf: m.role === "user" ? "flex-end" : "flex-start", whiteSpace: "pre-wrap" }}>
+            <div className={m.role === "user" ? "bubble-user" : "bubble-ai"} style={{ alignSelf: m.role === "user" ? "flex-end" : "flex-start", whiteSpace: "pre-wrap" }}>
               {m.text}
             </div>
           </div>
         ))}
-        {loading && (
-          <div className="bubble-ai" style={{ alignSelf: "flex-start" }}>
-            <span style={{ opacity: 0.6, animation: "pulse 1.2s ease-in-out infinite" }}>typing…</span>
-          </div>
-        )}
+        {loading && <div className="bubble-ai" style={{ alignSelf: "flex-start" }}><span style={{ opacity: 0.6, animation: "pulse 1.2s ease-in-out infinite" }}>Eloria is typing…</span></div>}
         <div ref={bottomRef} />
       </div>
       <div style={{ display: "flex", gap: 8, paddingTop: 8 }}>
@@ -989,7 +840,6 @@ function ChatPage({ t, lang }) {
   )
 }
 
-// ── Trends ────────────────────────────────────────
 function TrendsPage({ t }) {
   const [allData, setAllData] = useState([])
   const [view, setView] = useState("weekly")
@@ -999,28 +849,12 @@ function TrendsPage({ t }) {
       .then(r => r.json()).then(data => setAllData(data))
   }, [])
 
-  const weeklyData = allData.slice(-7).map(c => ({
-    date: new Date(c.timestamp).toLocaleDateString("en-IN", { weekday: "short" }),
-    mood: c.mood,
-    full: new Date(c.timestamp).toLocaleDateString("en-IN", { dateStyle: "medium" })
-  }))
-
-  const monthlyData = allData.slice(-30).map(c => ({
-    date: new Date(c.timestamp).toLocaleDateString("en-IN", { day: "numeric", month: "short" }),
-    mood: c.mood,
-    full: new Date(c.timestamp).toLocaleDateString("en-IN", { dateStyle: "medium" })
-  }))
-
+  const weeklyData = allData.slice(-7).map(c => ({ date: new Date(c.timestamp).toLocaleDateString("en-IN", { weekday: "short" }), mood: c.mood, full: new Date(c.timestamp).toLocaleDateString("en-IN", { dateStyle: "medium" }) }))
+  const monthlyData = allData.slice(-30).map(c => ({ date: new Date(c.timestamp).toLocaleDateString("en-IN", { day: "numeric", month: "short" }), mood: c.mood, full: new Date(c.timestamp).toLocaleDateString("en-IN", { dateStyle: "medium" }) }))
   const activeData = view === "weekly" ? weeklyData : monthlyData
-  const distribution = [1,2,3,4,5].map(v => ({
-    label: MOOD_CONFIG[v-1].label,
-    count: activeData.filter(d => d.mood === v).length,
-    color: MOOD_CONFIG[v-1].color,
-  })).filter(d => d.count > 0)
-
+  const distribution = [1,2,3,4,5].map(v => ({ label: MOOD_CONFIG[v-1].label, count: activeData.filter(d => d.mood === v).length, color: MOOD_CONFIG[v-1].color })).filter(d => d.count > 0)
   const avg = activeData.length ? (activeData.reduce((s,c) => s+c.mood, 0) / activeData.length).toFixed(1) : null
   const avgMood = avg ? MOOD_CONFIG[Math.round(avg) - 1] : null
-
   const streak = (() => {
     if (!allData.length) return 0
     let count = 0
@@ -1032,12 +866,11 @@ function TrendsPage({ t }) {
     }
     return count
   })()
-
   const getInsights = () => {
     const ins = []
     if (activeData.length < 2) return ins
     const vals = activeData.map(d => d.mood)
-    const avg = vals.reduce((a,b) => a+b,0) / vals.length
+    const a = vals.reduce((a,b) => a+b,0) / vals.length
     const half = Math.floor(vals.length/2)
     const f = vals.slice(0,half).reduce((a,b) => a+b,0)/half
     const s = vals.slice(half).reduce((a,b) => a+b,0)/(vals.length-half)
@@ -1046,21 +879,14 @@ function TrendsPage({ t }) {
     else ins.push({ icon: "🌿", text: "Your mood has been steady. Consistency is its own kind of strength." })
     const best = activeData.reduce((a,b) => a.mood > b.mood ? a : b)
     ins.push({ icon: "🌟", text: `Your best day recently was ${best.full} — a ${MOOD_CONFIG[best.mood-1].label} day.` })
-    if (activeData.filter(d => d.mood <= 2).length >= 3)
-      ins.push({ icon: "🫂", text: "You've had several low days. Consider talking to Eloria or a trusted person." })
-    if (avg >= 4) ins.push({ icon: "✨", text: "You've been doing really well this period. Celebrate that!" })
+    if (activeData.filter(d => d.mood <= 2).length >= 3) ins.push({ icon: "🫂", text: "You've had several low days. Consider talking to Eloria or a trusted person." })
+    if (a >= 4) ins.push({ icon: "✨", text: "You've been doing really well this period. Celebrate that!" })
     return ins
   }
-
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null
     const m = MOOD_CONFIG[payload[0].value - 1]
-    return (
-      <div style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 12 }}>
-        <div style={{ color: m?.color, fontWeight: 500 }}>{m?.label}</div>
-        <div style={{ color: "var(--text-sub)" }}>{payload[0].payload.full}</div>
-      </div>
-    )
+    return (<div style={{ background: "var(--bg-card)", border: "0.5px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 12 }}><div style={{ color: m?.color, fontWeight: 500 }}>{m?.label}</div><div style={{ color: "var(--text-sub)" }}>{payload[0].payload.full}</div></div>)
   }
 
   return (
@@ -1082,7 +908,7 @@ function TrendsPage({ t }) {
             <div className="card mb-16" style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{ flexShrink: 0 }}>{MOOD_FACES[Math.round(avg)](48)}</div>
               <div>
-                <div className="text-sub" style={{ fontSize: 11, marginBottom: 2 }}>{view === "weekly" ? t.weeklyAvg : t.monthlyAvg}</div>
+                <div className="text-sub" style={{ fontSize: 11, marginBottom: 2 }}>{view === "weekly" ? t.weeklyAvg : t.monthlyAvg} average</div>
                 <div style={{ fontSize: 16, fontWeight: 500, color: avgMood.color }}>{avgMood.label}</div>
                 <div className="text-sub" style={{ fontSize: 11 }}>{avg} / 5 · {activeData.length} check-in{activeData.length !== 1 ? "s" : ""}</div>
               </div>
@@ -1096,9 +922,7 @@ function TrendsPage({ t }) {
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--text-sub)" }} axisLine={false} tickLine={false} />
                 <YAxis domain={[0,5]} ticks={[1,2,3,4,5]} tick={{ fontSize: 11, fill: "var(--text-sub)" }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="mood" radius={[6,6,0,0]}>
-                  {weeklyData.map((e,i) => <Cell key={i} fill={MOOD_CONFIG[e.mood-1]?.color || "var(--primary)"} fillOpacity={0.8} />)}
-                </Bar>
+                <Bar dataKey="mood" radius={[6,6,0,0]}>{weeklyData.map((e,i) => <Cell key={i} fill={MOOD_CONFIG[e.mood-1]?.color || "var(--primary)"} fillOpacity={0.8} />)}</Bar>
               </BarChart>
             ) : (
               <LineChart data={monthlyData}>
@@ -1118,11 +942,7 @@ function TrendsPage({ t }) {
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < distribution.length - 1 ? 10 : 0 }}>
                     <div style={{ width: 10, height: 10, borderRadius: "50%", background: d.color, flexShrink: 0 }} />
                     <div style={{ fontSize: 12, color: "var(--text)", flex: 1 }}>{d.label}</div>
-                    <div style={{ display: "flex", gap: 3 }}>
-                      {Array.from({ length: d.count }).map((_,j) => (
-                        <div key={j} style={{ width: 8, height: 8, borderRadius: 2, background: d.color, opacity: 0.7 }} />
-                      ))}
-                    </div>
+                    <div style={{ display: "flex", gap: 3 }}>{Array.from({ length: d.count }).map((_,j) => (<div key={j} style={{ width: 8, height: 8, borderRadius: 2, background: d.color, opacity: 0.7 }} />))}</div>
                     <div style={{ fontSize: 11, color: "var(--text-sub)", minWidth: 24, textAlign: "right" }}>{d.count}d</div>
                   </div>
                 ))}
@@ -1146,13 +966,138 @@ function TrendsPage({ t }) {
   )
 }
 
-// ── Journal ───────────────────────────────────────
-function JournalPage({ onNavigate, t }) {
+const EMOTION_EMOJI = { happy: "😊", sad: "😔", angry: "😠", surprised: "😲", fearful: "😨", disgusted: "😖", neutral: "😌" }
+
+function FaceCheckIn() {
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
+  const [open, setOpen] = useState(false)
+  const [modelsLoaded, setModelsLoaded] = useState(false)
+  const [detecting, setDetecting] = useState(false)
+  const [error, setError] = useState(null)
+  const [result, setResult] = useState(null)
+
+  const openCamera = async () => {
+    setOpen(true); setResult(null); setError(null)
+    try {
+      if (!modelsLoaded) {
+        await faceapi.nets.tinyFaceDetector.loadFromUri("/models")
+        await faceapi.nets.faceExpressionNet.loadFromUri("/models")
+        setModelsLoaded(true)
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+      streamRef.current = stream
+      if (videoRef.current) videoRef.current.srcObject = stream
+    } catch (e) {
+      setError("Couldn't access your camera, or the detection models aren't loaded yet.")
+    }
+  }
+
+  const closeCamera = () => {
+    streamRef.current?.getTracks().forEach(t => t.stop())
+    streamRef.current = null
+    setOpen(false); setResult(null); setError(null)
+  }
+
+  const detect = async () => {
+    if (!videoRef.current) return
+    setDetecting(true)
+    try {
+      const detection = await faceapi
+        .detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions())
+        .withFaceExpressions()
+      if (!detection) {
+        setResult({ emotion: null })
+      } else {
+        const top = Object.entries(detection.expressions).sort((a, b) => b[1] - a[1])[0][0]
+        setResult({ emotion: top })
+      }
+    } catch {
+      setError("Something went wrong reading your expression. You can still write freely.")
+    }
+    setDetecting(false)
+  }
+
+  useEffect(() => () => streamRef.current?.getTracks().forEach(t => t.stop()), [])
+
+  if (!open) {
+    return (
+      <button className="btn btn-ghost btn-sm" style={{ marginBottom: 16 }} onClick={openCamera}>
+        📷 Check in with your face (optional)
+      </button>
+    )
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16, textAlign: "center" }}>
+      <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", maxWidth: 280, borderRadius: 12, marginBottom: 12, transform: "scaleX(-1)" }} />
+      {error && <div className="text-sub" style={{ fontSize: 11, marginBottom: 12, color: "var(--danger, #e07060)" }}>{error}</div>}
+      {result && (
+        result.emotion ? (
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 32 }}>{EMOTION_EMOJI[result.emotion] || "🙂"}</div>
+            <div className="text-sub" style={{ fontSize: 12, textTransform: "capitalize" }}>Looking {result.emotion}</div>
+          </div>
+        ) : (
+          <div className="text-sub" style={{ fontSize: 12, marginBottom: 12 }}>Couldn't detect a face clearly — try better lighting.</div>
+        )
+      )}
+      {!result && !error && (
+        <div className="text-sub" style={{ fontSize: 11, marginBottom: 12 }}>This stays on your device only — nothing is uploaded, ever.</div>
+      )}
+      <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+        {!result && <button className="btn btn-primary btn-sm" onClick={detect} disabled={detecting}>{detecting ? "Looking…" : "Detect"}</button>}
+        <button className="btn btn-ghost btn-sm" onClick={closeCamera}>Close</button>
+      </div>
+    </div>
+  )
+}
+
+function JournalPage({ onNavigate, t, lang }) {
   const [content, setContent] = useState("")
   const [reflection, setReflection] = useState(null)
   const [loading, setLoading] = useState(false)
   const [entries, setEntries] = useState([])
   const [view, setView] = useState("write")
+  const [recording, setRecording] = useState(false)
+  const recognitionRef = useRef(null)
+
+  const SPEECH_LANG = { English: "en-IN", Tamil: "ta-IN", Telugu: "te-IN", Malayalam: "ml-IN", Kannada: "kn-IN", Hindi: "hi-IN" }
+  const voiceSupported = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition)
+
+  const toggleRecording = () => {
+    if (recording) {
+      recognitionRef.current?.stop()
+      return
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) return
+
+    const recognition = new SpeechRecognition()
+    recognition.lang = SPEECH_LANG[lang] || "en-IN"
+    recognition.continuous = true
+    recognition.interimResults = true
+
+    let finalTranscript = content ? content.trim() + " " : ""
+
+    recognition.onresult = (event) => {
+      let interim = ""
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript
+        if (event.results[i].isFinal) finalTranscript += transcript + " "
+        else interim += transcript
+      }
+      setContent((finalTranscript + interim).slice(0, 5000))
+    }
+    recognition.onerror = () => setRecording(false)
+    recognition.onend = () => setRecording(false)
+
+    recognition.start()
+    recognitionRef.current = recognition
+    setRecording(true)
+  }
+
+  useEffect(() => () => recognitionRef.current?.stop(), [])
 
   useEffect(() => {
     fetch(`${API}/journal`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } })
@@ -1201,7 +1146,24 @@ function JournalPage({ onNavigate, t }) {
         <>
           <div className="section-title">{t.whatsOnYourMind}</div>
           <div className="text-sub mb-12">{t.writeFreely}</div>
-          <textarea placeholder={t.journalPrompt} value={content} onChange={e => setContent(e.target.value)} rows={10} style={{ resize: "none", marginBottom: 8, lineHeight: 1.8, fontSize: 14 }} />
+          <FaceCheckIn />
+          <div style={{ position: "relative", marginBottom: 8 }}>
+            <textarea placeholder={t.journalPrompt} value={content} onChange={e => setContent(e.target.value)} rows={10} style={{ resize: "none", lineHeight: 1.8, fontSize: 14 }} />
+            {voiceSupported && (
+              <button
+                onClick={toggleRecording}
+                className="btn btn-sm"
+                style={{
+                  position: "absolute", bottom: 10, right: 10,
+                  background: recording ? "var(--danger, #e07060)" : "var(--primary, #7c6fff)",
+                  color: "#fff", border: "none", borderRadius: 20, padding: "6px 12px", fontSize: 11,
+                }}
+              >
+                {recording ? "⏹ Stop" : "🎤 Speak"}
+              </button>
+            )}
+          </div>
+          {recording && <div className="text-sub" style={{ fontSize: 11, marginBottom: 8, color: "var(--danger, #e07060)" }}>● Listening…</div>}
           <div className="text-sub" style={{ fontSize: 11, textAlign: "right", marginBottom: 16 }}>
             {content.trim().length < 10 ? `${10 - content.trim().length} more characters needed` : `${content.trim().length} / 5000`}
           </div>
@@ -1230,8 +1192,7 @@ function JournalPage({ onNavigate, t }) {
   )
 }
 
-// ── Reminder Banner ───────────────────────────────
-function ReminderBanner({ onCheckIn, t }) {
+function ReminderBanner({ onCheckIn }) {
   const [show, setShow] = useState(false)
   useEffect(() => {
     fetch(`${API}/checkins/today`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } })
@@ -1249,28 +1210,76 @@ function ReminderBanner({ onCheckIn, t }) {
   )
 }
 
-// ── Nav Bar ───────────────────────────────────────
-function NavBar({ page, onNavigate, t }) {
-  const items = [
-    { icon: "🏠", label: "Home", page: "home" },
-    { icon: "💜", label: t.checkIn, page: "checkin" },
-    { icon: "💬", label: t.talkToMe.split(" ")[0], page: "chat" },
-    { icon: "📓", label: t.journal.split(" ")[1] || "Journal", page: "journal" },
-    { icon: "📊", label: t.myTrends.split(" ")[1] || "Trends", page: "trends" },
-  ]
+
+function SmartBreakReminder({ nickname }) {
+  const [nudge, setNudge] = useState(null) // 'midnight' | 'longuse' | null
+  const [dismissedMidnightToday, setDismissedMidnightToday] = useState(false)
+  const sessionStartRef = useRef(Date.now())
+  const lastLongUseNudgeRef = useRef(Date.now())
+
+  const LONG_USE_MS = 45 * 60 * 1000 // 45 minutes
+
+  useEffect(() => {
+    if (!nickname) return
+
+    const checkTime = () => {
+      const now = Date.now()
+      const hour = new Date().getHours()
+
+      // Midnight sleep nudge — once per calendar day, only between 12am–4am
+      const todayKey = `midnightNudgeSeen:${nickname}:${new Date().toDateString()}`
+      const alreadySeenToday = localStorage.getItem(todayKey)
+      if (hour >= 0 && hour < 5 && !alreadySeenToday && !dismissedMidnightToday && nudge === null) {
+        setNudge("midnight")
+        return
+      }
+
+      // Long continuous use nudge — every 45 minutes of the app staying open
+      if (nudge === null && now - lastLongUseNudgeRef.current >= LONG_USE_MS) {
+        setNudge("longuse")
+      }
+    }
+
+    const interval = setInterval(checkTime, 60 * 1000) // check once a minute
+    checkTime()
+    return () => clearInterval(interval)
+  }, [nickname, nudge, dismissedMidnightToday])
+
+  const dismiss = () => {
+    if (nudge === "midnight") {
+      const todayKey = `midnightNudgeSeen:${nickname}:${new Date().toDateString()}`
+      localStorage.setItem(todayKey, "1")
+      setDismissedMidnightToday(true)
+    }
+    if (nudge === "longuse") {
+      lastLongUseNudgeRef.current = Date.now()
+    }
+    setNudge(null)
+  }
+
+  if (!nudge) return null
+
+  const content = nudge === "midnight"
+    ? { emoji: "🌙", text: "It's getting late. Your mind (and body) will thank you for some rest.", action: null }
+    : { emoji: "🌿", text: "You've been here a while. A short break might help you come back clearer.", action: null }
+
   return (
-    <nav className="nav-bar">
-      {items.map(i => (
-        <div key={i.page} className={`nav-item ${page === i.page ? "active" : ""}`} onClick={() => onNavigate(i.page)}>
-          <span className="nav-icon">{i.icon}</span>
-          <span>{i.label}</span>
-        </div>
-      ))}
-    </nav>
+    <div className="fade-up" style={{
+      position: "fixed", bottom: 88, left: 16, right: 16, maxWidth: 420, margin: "0 auto",
+      background: "rgba(45, 42, 74, 0.92)", backdropFilter: "blur(10px)",
+      color: "#fff", padding: "14px 16px", borderRadius: 16,
+      display: "flex", alignItems: "center", gap: 12, zIndex: 250,
+      boxShadow: "0 8px 24px rgba(0,0,0,0.25)"
+    }}>
+      <span style={{ fontSize: 20 }}>{content.emoji}</span>
+      <span style={{ flex: 1, fontSize: 13, lineHeight: 1.5 }}>{content.text}</span>
+      <button onClick={dismiss} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 20, padding: "6px 14px", fontSize: 12, cursor: "pointer", flexShrink: 0, fontFamily: "var(--font)" }}>
+        Got it
+      </button>
+    </div>
   )
 }
 
-// ── App Root ──────────────────────────────────────
 export default function App() {
   const [page, setPage] = useState("onboard")
   const [nickname, setNickname] = useState("")
@@ -1310,44 +1319,73 @@ export default function App() {
     setNickname(""); setPage("auth")
   }
   const navigate = p => setPage(p)
-  const showNav = ["home", "checkin", "chat", "trends", "history", "journal"].includes(page)
 
-  // Dynamic background based on mood ambience
-  const bodyBg = amb && !dark
+  // Pages that show the OLD nav (not home — home has its own new nav)
+  const showOldNav = ["checkin", "chat", "trends", "history", "journal"].includes(page)
+  // Pages that show the old top bar (not home, not onboard, not auth)
+  const showTopBar = !["onboard", "auth", "home"].includes(page)
+
+  const bodyBg = amb && !dark && page !== "home"
     ? amb.bg
     : dark ? "#1a1730" : "var(--bg)"
 
   return (
-    <div style={{ background: bodyBg, minHeight: "100vh", transition: "background 0.8s ease", position: "relative" }}>
-      {/* Floating particles */}
-      {showNav && amb && <Particles symbol={amb.particle} dark={dark} />}
+    <div style={{ background: page === "home" ? "transparent" : bodyBg, minHeight: "100vh", transition: "background 0.8s ease", position: "relative" }}>
 
-      {/* Top bar */}
-      {page !== "onboard" && page !== "auth" && (
+      {/* Top bar — hidden on home (home has its own) */}
+      {showTopBar && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 20px", pointerEvents: "none" }}>
           <button onClick={handleLogout} style={{ background: "none", border: "none", color: "var(--text-sub)", fontSize: 12, cursor: "pointer", fontFamily: "var(--font)", pointerEvents: "all" }}>
             {t.logout}
           </button>
           <div style={{ display: "flex", gap: 8, alignItems: "center", pointerEvents: "all" }}>
-            <button onClick={() => setShowHelper(true)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer" }} title={t.soulmateHelper}>🆘</button>
+            <button onClick={() => navigate("support")} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer" }} title={t.soulmateHelper}>🆘</button>
             <LangDropdown lang={lang} onLangChange={handleLangChange} t={t} />
             <ThemeToggle dark={dark} onToggle={() => setDark(d => !d)} />
           </div>
         </div>
       )}
 
-      {showNav && <ReminderBanner onCheckIn={() => navigate("checkin")} t={t} />}
+      {/* Reminder banner only on non-home pages */}
+      {showOldNav && <ReminderBanner onCheckIn={() => navigate("checkin")} />}
 
+      {/* Smart break reminders — midnight nudge + 45-min long-use nudge, app-wide */}
+      {nickname && <SmartBreakReminder nickname={nickname} />}
+
+      {/* Pages */}
       {page === "onboard"  && <OnboardPage onDone={() => { localStorage.setItem("onboarded","1"); setPage("auth") }} />}
       {page === "auth"     && <AuthPage onLogin={handleLogin} t={t} lang={lang} onLangChange={handleLangChange} />}
-      {page === "home"     && <HomePage nickname={nickname} onNavigate={navigate} t={t} moodAmbience={moodAmbience} />}
+      {page === "home" && (
+        <NewHomePage
+          onNavigate={navigate}
+          onLogout={handleLogout}
+          dark={dark}
+          onToggleDark={() => setDark(d => !d)}
+          page={page}
+        />
+      )}
       {page === "checkin"  && <CheckInPage onNavigate={navigate} t={t} onMoodSet={handleMoodSet} />}
       {page === "history"  && <HistoryPage t={t} />}
       {page === "chat"     && <ChatPage t={t} lang={lang} />}
+      {page === "support"  && <SupportPage onNavigate={navigate} page={page} dark={dark} />}
+      {page === "library"  && <LibraryPage onNavigate={navigate} page={page} dark={dark} />}
+      {page === "stories"  && <StoriesPage onNavigate={navigate} page={page} dark={dark} lang={lang} />}
+      {page === "tree"     && <HavenTreePage onNavigate={navigate} page={page} dark={dark} />}
       {page === "trends"   && <TrendsPage t={t} />}
-      {page === "journal"  && <JournalPage onNavigate={navigate} t={t} />}
+      {page === "journal"  && <JournalPage onNavigate={navigate} t={t} lang={lang} />}
+      {page === "relax"     && <RelaxPage     onNavigate={navigate} page={page} dark={dark} />}
+      {page === "breathing" && <BreathingPage onNavigate={navigate} dark={dark} />}
+      {page === "kolam"     && <KolamPage     onNavigate={navigate} dark={dark} />}
+      {page === "scribble"  && <ScribblePage  onNavigate={navigate} dark={dark} />}
+      {page === "bubbles"   && <BubblePage    onNavigate={navigate} dark={dark} />}
+      {page === "music"     && <MusicPage     onNavigate={navigate} dark={dark} />}
+      {page === "focus" && <FocusPage onNavigate={navigate} page={page} dark={dark} />}
+      {page === "scheduler" && <SchedulerPage onNavigate={navigate} page={page} dark={dark} />}
+      {page === "grades" && <GradesPage onNavigate={navigate} page={page} dark={dark} />}
+      {page === "pomodoro" && <PomodoroPage onNavigate={navigate} page={page} dark={dark} />}
+      {/* Old nav bar only for non-home pages */}
+      {showOldNav && <NewNavBar page={page} onNavigate={navigate} />}
 
-      {showNav && <NavBar page={page} onNavigate={navigate} t={t} />}
       {showHelper && <HelperPanel onClose={() => setShowHelper(false)} t={t} />}
     </div>
   )
