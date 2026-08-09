@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavBar from '../components/NavBar';
 
-const API = 'http://localhost:8000';
+const API = (import.meta.env.VITE_API_URL || "http://localhost:8000");
 
 const FOCUS_SECONDS = 25 * 60;
 const REST_SECONDS = 5 * 60;

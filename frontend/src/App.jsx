@@ -19,7 +19,7 @@ import LibraryPage  from './pages/LibraryPage'
 import StoriesPage  from './pages/StoriesPage'
 import HavenTreePage from './pages/HavenTreePage'
 
-const API = "http://localhost:8000"
+const API = (import.meta.env.VITE_API_URL || "http://localhost:8000")
 
 const QUOTES = [
   "🌿 Every feeling is valid.",

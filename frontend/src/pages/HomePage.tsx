@@ -5,7 +5,7 @@ import MoodFace from '../components/MoodFace'
 import HavenTree from '../components/HavenTree'
 import NavBar from '../components/NavBar'
 
-const API = 'http://localhost:8000'
+const API = (import.meta.env.VITE_API_URL || "http://localhost:8000")
 
 const MOOD_CONFIG = [
   { label: 'Very Low', color: '#e07060', bg: '#ffded6' },
