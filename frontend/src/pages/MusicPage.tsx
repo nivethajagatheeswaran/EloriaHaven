@@ -44,6 +44,10 @@ export default function MusicPage({ onNavigate, dark }: Props) {
   // TRACKS_PER_CATEGORY attempts) so missing files in a partially-filled
   // category don't break playback.
   const tryPlay = (categoryId: string, index: number) => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current = null
+    }
     const src = `/sounds/${categoryId}/${index}.mp3`
     const audio = new Audio(src)
     audio.loop = true
@@ -111,6 +115,10 @@ export default function MusicPage({ onNavigate, dark }: Props) {
     if (!playing) return
     attemptsRef.current = 0
     const nextIndex = ((trackIndex) % TRACKS_PER_CATEGORY) + 1
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current = null
+    }
     tryPlay(playing, nextIndex)
   }
 
