@@ -234,7 +234,7 @@ async def chat(data: ChatMessage, nickname: str = Depends(get_current_user)):
     messages.append({"role": "user", "content": data.message})
 
     response = client_ai.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=messages
     )
     reply = response.choices[0].message.content
@@ -260,7 +260,7 @@ async def save_journal(data: JournalEntry, nickname: str = Depends(get_current_u
     client_ai = Groq(api_key=os.getenv("GROQ_API_KEY"))
     
     response = client_ai.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -364,7 +364,7 @@ async def suggest_priority(text: str) -> str:
     try:
         client_ai = Groq(api_key=os.getenv("GROQ_API_KEY"))
         response = client_ai.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[
                 {
                     "role": "system",
@@ -527,7 +527,7 @@ async def analyze_grades(subjects: List[dict], previous_subjects: Optional[List[
     )
 
     response = client_ai.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -560,7 +560,7 @@ async def extract_grades_from_pdf(file_bytes: bytes) -> List[dict]:
 
     client_ai = Groq(api_key=os.getenv("GROQ_API_KEY"))
     response = client_ai.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -674,7 +674,7 @@ async def pomodoro_checkin(data: PomodoroCheckIn, nickname: str = Depends(get_cu
     )
 
     response = client_ai.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",
@@ -729,7 +729,7 @@ async def generate_story(data: StoryRequest, nickname: str = Depends(get_current
     )
 
     response = client_ai.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "system",

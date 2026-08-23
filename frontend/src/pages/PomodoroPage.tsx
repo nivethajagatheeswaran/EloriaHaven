@@ -8,7 +8,7 @@ const FOCUS_SECONDS = 25 * 60;
 const REST_SECONDS = 5 * 60;
 
 type Mode = 'focus' | 'rest';
-type Sound = 'none' | 'rain' | 'forest' | 'ocean' | 'wind' | 'waves';
+type Sound = 'none' | 'rain' | 'forest' | 'binaural' | 'piano';
 const TRACKS_PER_CATEGORY = 10;
 
 interface PomodoroPageProps {
@@ -87,12 +87,36 @@ export default function PomodoroPage({ onNavigate, page, dark }: PomodoroPagePro
   const skip = () => handleSessionEnd();
 
   // ── Ambient sound (procedural, no audio files) ─────
+  const pauseSound = () => {
+    if (audioRef.current) audioRef.current.pause();
+  };
+
+  const resumeSound = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    } else if (sound !== 'none') {
+      startSound(sound); // nothing loaded yet — start fresh
+    }
+  };
+
+  // Changing the selected track: stop old, start new — only if currently running
   useEffect(() => {
     stopSound();
-    if (sound !== 'none') startSound(sound);
+    if (running && sound !== 'none') startSound(sound);
     return () => stopSound();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sound]);
+
+  // Timer running/paused: pause or resume the SAME track, don't restart it
+  useEffect(() => {
+    if (sound === 'none') return;
+    if (running) {
+      resumeSound();
+    } else {
+      pauseSound();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [running]);
 
   useEffect(() => stopSound, []);
 
@@ -240,7 +264,7 @@ export default function PomodoroPage({ onNavigate, page, dark }: PomodoroPagePro
 
         {/* Ambient sound picker */}
         <div className="flex items-center gap-2 mb-6">
-          {(['none', 'rain', 'wind', 'waves'] as const).map((s) => (
+          {(['none', 'rain', 'forest', 'binaural', 'piano'] as const).map((s) => (
             <button
               key={s}
               onClick={() => setSound(s)}

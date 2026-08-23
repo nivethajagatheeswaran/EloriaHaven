@@ -989,8 +989,9 @@ function FaceCheckIn() {
       streamRef.current = stream
       if (videoRef.current) videoRef.current.srcObject = stream
     } catch (e) {
-      setError("Couldn't access your camera, or the detection models aren't loaded yet.")
-    }
+    console.error("Face check-in error:", e)
+    setError("Couldn't access your camera, or the detection models aren't loaded yet.")
+  }
   }
 
   const closeCamera = () => {
