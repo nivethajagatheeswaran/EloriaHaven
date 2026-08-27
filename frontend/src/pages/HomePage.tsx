@@ -7,12 +7,12 @@ import NavBar from '../components/NavBar'
 
 const API = (import.meta.env.VITE_API_URL || "http://localhost:8000")
 
-const MOOD_CONFIG = [
-  { label: 'Very Low', color: '#e07060', bg: '#ffded6' },
-  { label: 'Low',      color: '#d09060', bg: '#ffecd6' },
-  { label: 'Neutral',  color: '#7c6fff', bg: '#eeecff' },
-  { label: 'Good',     color: '#5a9e6f', bg: '#e8f5e9' },
-  { label: 'Great',    color: '#c9a227', bg: '#fff8e1' },
+const MOOD_CONFIG = (t: any) => [
+  { label: t.moodVeryLow, color: '#e07060', bg: '#ffded6' },
+  { label: t.moodLow,      color: '#d09060', bg: '#ffecd6' },
+  { label: t.moodNeutral,  color: '#7c6fff', bg: '#eeecff' },
+  { label: t.moodGood,     color: '#5a9e6f', bg: '#e8f5e9' },
+  { label: t.moodGreat,    color: '#c9a227', bg: '#fff8e1' },
 ]
 
 const AMBIENCE = [
@@ -41,28 +41,29 @@ function getTimeOfDay() {
   return 'night'
 }
 
-function getGreeting() {
+function getGreeting(t: any) {
   const h = new Date().getHours()
-  if (h >= 5  && h < 12) return 'Good morning'
-  if (h >= 12 && h < 17) return 'Good afternoon'
-  if (h >= 17 && h < 21) return 'Good evening'
-  if (h >= 21)            return 'Good night'
-  return 'Hey, night owl'
+  if (h >= 5  && h < 12) return { text: t.goodMorning,   emoji: '🌤️' }
+  if (h >= 12 && h < 17) return { text: t.goodAfternoon, emoji: '☀️' }
+  if (h >= 17 && h < 21) return { text: t.goodEvening,   emoji: '🌙' }
+  return { text: t.goodNight, emoji: '🌟' }
 }
 
-function getGreetingEmoji() {
-  const h = new Date().getHours()
-  if (h >= 5  && h < 12) return '🌤️'
-  if (h >= 12 && h < 17) return '☀️'
-  if (h >= 17 && h < 21) return '🌙'
-  return '🌟'
-}
 
-const QUICK_ACTIONS = [
-  { label: 'Relax',        sub: 'Breathing, music, kolam', page: 'relax'   },
-  { label: 'Focus',        sub: 'Tasks, grades, timer',     page: 'focus'   },
-  { label: 'Journal',      sub: 'Write or speak freely',    page: 'journal' },
-  { label: 'Talk to Eloria', sub: "I'm here to listen",    page: 'chat'    },
+const QUICK_ACTIONS = (t: any) => [
+  { label: t.relaxLabel,   sub: t.relaxSub,   page: 'relax'   },
+  { label: t.focusLabel,   sub: t.focusSub,   page: 'focus'   },
+  { label: t.journalLabel, sub: t.journalSub, page: 'journal' },
+  { label: t.talkLabel,    sub: t.talkSub,    page: 'chat'    },
+]
+
+const LANGUAGES = [
+  { code: 'English',   label: 'English',   native: 'English'   },
+  { code: 'Tamil',     label: 'Tamil',     native: 'தமிழ்'     },
+  { code: 'Telugu',    label: 'Telugu',    native: 'తెలుగు'    },
+  { code: 'Malayalam', label: 'Malayalam', native: 'മലയാളം'    },
+  { code: 'Kannada',   label: 'Kannada',   native: 'ಕನ್ನಡ'     },
+  { code: 'Hindi',     label: 'Hindi',     native: 'हिंदी'     },
 ]
 
 interface HomePageProps {
@@ -70,15 +71,18 @@ interface HomePageProps {
   onLogout: () => void
   dark: boolean
   onToggleDark: () => void
-  page: string 
+  page: string
+  lang: string
+  onLangChange: (code: string) => void
+  t: any
 }
 
-export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, page }: HomePageProps) {
+export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, page, lang, onLangChange, t }: HomePageProps) {
   const { nickname, moodAmbience, setMoodAmbience, treeStats, addTreeAction } = useStore()
   const [selectedMood, setSelectedMood] = useState<number | null>(moodAmbience ? moodAmbience - 1 : null)
   const [moodSaved, setMoodSaved] = useState(false)
   const [showTree, setShowTree] = useState(false)
-
+  const [showLangMenu, setShowLangMenu] = useState(false)
   const timeOfDay = getTimeOfDay()
   const amb = selectedMood !== null ? AMBIENCE[selectedMood] : null
   const bg = dark
@@ -118,7 +122,7 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
           className="text-xs font-medium px-3 py-1.5 rounded-full
             bg-white/20 backdrop-blur-md border border-white/30
             text-white/70 hover:text-white/90 transition-colors">
-          Logout
+          {t.logout}
         </motion.button>
         <div className="flex gap-2 items-center">
           <motion.button whileTap={{ scale: 0.9 }}
@@ -127,11 +131,35 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
               flex items-center justify-center text-sm">
             🆘
           </motion.button>
-          <motion.button whileTap={{ scale: 0.9 }}
-            className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30
-              flex items-center justify-center text-sm">
-            🌐
-          </motion.button>
+          <div className="relative">
+            <motion.button whileTap={{ scale: 0.9 }}
+              onClick={() => setShowLangMenu(v => !v)}
+              className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30
+                flex items-center justify-center text-sm">
+              🌐
+            </motion.button>
+            <AnimatePresence>
+              {showLangMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                  className="absolute top-full right-0 mt-2 rounded-xl bg-white/95 backdrop-blur-md
+                    border border-white/50 shadow-lg overflow-hidden z-50 min-w-[150px]">
+                  {LANGUAGES.map(l => (
+                    <div
+                      key={l.code}
+                      onClick={() => { onLangChange(l.code); setShowLangMenu(false) }}
+                      className={`px-4 py-2.5 text-xs cursor-pointer flex justify-between items-center
+                        ${lang === l.code ? 'bg-primary/10 text-primary font-medium' : 'text-[#1a1a2e] hover:bg-black/5'}`}>
+                      <span>{l.label}</span>
+                      <span className="opacity-60">{l.native}</span>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <motion.button whileTap={{ scale: 0.9 }}
             onClick={() => onToggleDark()}
             className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30
@@ -153,12 +181,12 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}>
           <div className="text-white/70 text-xs mb-1 font-medium">
-            {getGreeting()} {getGreetingEmoji()}
+            {getGreeting(t).text} {getGreeting(t).emoji}
           </div>
           <div className="text-white text-lg font-semibold tracking-tight mb-0.5">
             {nickname}
           </div>
-          <div className="text-white/70 text-xs">How are you feeling today?</div>
+          <div className="text-white/70 text-xs">{t.howFeeling}</div>
           {/* Decorative shine */}
           <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-white/5 -translate-y-8 translate-x-8"/>
         </motion.div>
@@ -168,9 +196,9 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}>
-          <div className="text-sm font-semibold text-[#1a1a2e] mb-3 tracking-tight">Today's mood</div>
+          <div className="text-sm font-semibold text-[#1a1a2e] mb-3 tracking-tight">{t.homeMoodLabel}</div>
           <div className="flex gap-2 mb-5">
-            {MOOD_CONFIG.map((m, i) => (
+            {MOOD_CONFIG(t).map((m, i) => (
               <motion.button
                 key={i}
                 onClick={() => handleMoodSelect(i)}
@@ -207,7 +235,7 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
               exit={{ opacity: 0, height: 0 }}
               className="mb-4 px-4 py-2.5 rounded-xl bg-white/70 backdrop-blur-sm
                 border border-white/50 text-xs text-[#5a9e6f] font-medium">
-              ✓ Check-in saved · Your Haven Tree is growing 🌱
+              {t.checkinSavedMsg}
             </motion.div>
           )}
         </AnimatePresence>
@@ -229,8 +257,8 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
               fireflies={treeStats.fireflies}
               size={48}/>
             <div className="flex-1">
-              <div className="text-sm font-semibold text-[#1a1a2e] mb-0.5">Your Haven Tree</div>
-              <div className="text-xs text-success">Day {treeStats.day} · {treeStats.leaves} leaves growing</div>
+              <div className="text-sm font-semibold text-[#1a1a2e] mb-0.5"> {t.yourHavenTree}</div>
+              <div className="text-xs text-success">{t.dayLabel} {treeStats.day} · {treeStats.leaves} {t.leavesGrowing}</div>
             </div>
             <motion.span
               animate={{ rotate: showTree ? 90 : 0 }}
@@ -270,7 +298,7 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
                 <button
                   onClick={(e) => { e.stopPropagation(); onNavigate('tree') }}
                   className="w-full text-center text-xs font-medium text-primary py-2 rounded-xl bg-white/40 hover:bg-white/60 transition-colors">
-                  See full tree →
+                  {t.seeFullTree}
                 </button>
               </motion.div>
             )}
@@ -282,9 +310,9 @@ export default function HomePage({ onNavigate, onLogout, dark, onToggleDark, pag
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}>
-          <div className="text-sm font-semibold text-[#1a1a2e] mb-3 tracking-tight">What would you like?</div>
+          <div className="text-sm font-semibold text-[#1a1a2e] mb-3 tracking-tight">{t.whatWouldYouLikeShort}</div>
           <div className="grid grid-cols-2 gap-3">
-            {QUICK_ACTIONS.map((q, i) => (
+            {QUICK_ACTIONS(t).map((q, i) => (
               <motion.button
                 key={q.page}
                 onClick={() => onNavigate(q.page)}
