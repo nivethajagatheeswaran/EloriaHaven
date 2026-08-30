@@ -12,15 +12,6 @@ interface StoriesPageProps {
   t: any;
 }
 
-const THEMES = (t: any) => [
-  { id: 'forest', label: t.themeForest, apiLabel: 'A quiet forest', emoji: '🌲' },
-  { id: 'rain', label: t.themeRain, apiLabel: 'Rain on a rooftop', emoji: '🌧️' },
-  { id: 'ocean', label: t.themeOcean, apiLabel: 'A calm shore', emoji: '🌊' },
-  { id: 'village', label: t.themeVillage, apiLabel: 'An old village at night', emoji: '🏮' },
-  { id: 'train', label: t.themeTrain, apiLabel: 'A slow train journey', emoji: '🚂' },
-  { id: 'garden', label: t.themeGarden, apiLabel: 'A garden at dusk', emoji: '🌿' },
-];
-
 const SPEECH_LANG: Record<string, string> = {
   English: 'en-IN',
   Tamil: 'ta-IN',
@@ -31,6 +22,15 @@ const SPEECH_LANG: Record<string, string> = {
 };
 
 export default function StoriesPage({ onNavigate, page, dark, lang, t }: StoriesPageProps) {
+  const THEMES = [
+    { id: 'forest', label: t.themeForest, emoji: '🌲' },
+    { id: 'rain', label: t.themeRain, emoji: '🌧️' },
+    { id: 'ocean', label: t.themeOcean, emoji: '🌊' },
+    { id: 'village', label: t.themeVillage, emoji: '🏮' },
+    { id: 'train', label: t.themeTrain, emoji: '🚂' },
+    { id: 'garden', label: t.themeGarden, emoji: '🌿' },
+  ];
+
   const [selected, setSelected] = useState<string | null>(null);
   const [customTheme, setCustomTheme] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,8 +43,7 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
 
   const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
-  const themes = THEMES(t);
-  // Voices load asynchronously in most browsers — cache them once ready.
+
   useEffect(() => {
     if (!speechSupported) return;
     const loadVoices = () => {
@@ -62,6 +61,7 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
     'ravi', 'rishi', 'prabhat', 'hemant', 'madhur', 'ajit',
     'female', 'zira', 'susan', 'samantha', 'heera', 'lekha', 'veena', 'kalpana', 'raveena',
   ];
+
   const pickVoice = (targetLangCode: string): { voice: SpeechSynthesisVoice | null; matchedLanguage: boolean } => {
     const voices = voicesRef.current.length ? voicesRef.current : window.speechSynthesis.getVoices();
     const langPrefix = targetLangCode.split('-')[0];
@@ -100,21 +100,21 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.detail || t.storiesErrorFallback);
+        throw new Error(err.detail || t.storyGenError);
       }
       const data = await res.json();
       setStory(data.story);
     } catch (e: any) {
-      setError(e.message || t.storiesErrorGeneric);
+      setError(e.message || t.storyGenError);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePresetClick = (theme: ReturnType<typeof THEMES>[number]) => {
+  const handlePresetClick = (theme: (typeof THEMES)[number]) => {
     setSelected(theme.id);
     setCustomTheme('');
-    generate(theme.apiLabel);
+    generate(theme.label);
   };
 
   const handleCustomSubmit = () => {
@@ -136,11 +136,17 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
     const utterance = new SpeechSynthesisUtterance(story);
     utterance.lang = voice?.lang || targetLangCode;
     if (voice) utterance.voice = voice;
+    // Slower, deliberate pace and a lower pitch for a warm, grandparent-style
+    // storytelling cadence rather than a brisk read-aloud voice.
     utterance.rate = 0.7;
     utterance.pitch = 0.86;
 
     if (!matchedLanguage && targetLangCode !== 'en-IN') {
-      setVoiceWarning(t.storiesNoVoiceWarning.replace('{lang}', lang));
+      setVoiceWarning(
+        typeof t.noVoiceWarning === 'function'
+          ? t.noVoiceWarning(lang)
+          : `No ${lang} voice is installed on this device, so this will read in English instead.`
+      );
     }
 
     utterance.onend = () => {
@@ -149,8 +155,6 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
     };
     utteranceRef.current = utterance;
 
-    // Chrome silently drops speak() if fired in the same tick right after
-    // cancel() — a small delay avoids that race.
     setTimeout(() => {
       window.speechSynthesis.speak(utterance);
       setSpeaking(true);
@@ -193,7 +197,7 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
             onClick={() => { stopSpeaking(); onNavigate('relax'); }}
             className={`text-sm mb-3 ${dark ? 'text-white/50' : 'text-[#6b6690]'}`}
           >
-            ← {t.relaxNavBtn}
+            ← {t.relaxLabel || 'Relax'}
           </button>
           <h1 className={`text-2xl font-medium tracking-tight ${dark ? 'text-white' : 'text-[#2d2a4a]'}`}>
             {t.storiesTitle}
@@ -207,7 +211,7 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
           {!story && !loading && (
             <motion.div key="picker" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="grid grid-cols-2 gap-3 mb-6">
-                {themes.map((theme) => (
+                {THEMES.map((theme) => (
                   <button
                     key={theme.id}
                     onClick={() => handlePresetClick(theme)}
@@ -224,15 +228,15 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
                   </button>
                 ))}
               </div>
- 
+
               <div className={`rounded-2xl p-4 ${dark ? 'bg-white/[0.06] border border-white/10' : 'bg-white/70 border border-white/60'}`}>
-                <p className={`text-xs mb-2 ${dark ? 'text-white/50' : 'text-[#8a84b0]'}`}>{t.storiesOwnTheme}</p>
+                <p className={`text-xs mb-2 ${dark ? 'text-white/50' : 'text-[#8a84b0]'}`}>{t.orDescribeTheme}</p>
                 <div className="flex gap-2">
                   <input
                     value={customTheme}
                     onChange={(e) => setCustomTheme(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleCustomSubmit()}
-                    placeholder={t.storiesCustomPlaceholder}
+                    placeholder={t.customThemePlaceholder}
                     className={`flex-1 bg-transparent outline-none text-sm px-3 py-2 rounded-xl ${
                       dark ? 'bg-white/[0.05] text-white placeholder-white/30' : 'bg-white/60 text-[#2d2a4a] placeholder-[#a29dc4]'
                     }`}
@@ -242,19 +246,19 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
                     disabled={!customTheme.trim()}
                     className="px-4 py-2 rounded-full text-xs font-medium bg-primary text-white disabled:opacity-40"
                   >
-                    {t.storiesTellIt}
+                    {t.tellIt}
                   </button>
                 </div>
               </div>
             </motion.div>
           )}
- 
+
           {loading && (
             <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
-              <p className={`text-sm ${dark ? 'text-white/50' : 'text-[#8a84b0]'}`}>{t.storiesThinking}</p>
+              <p className={`text-sm ${dark ? 'text-white/50' : 'text-[#8a84b0]'}`}>{t.eloriaThinking}</p>
             </motion.div>
           )}
- 
+
           {story && !loading && (
             <motion.div
               key="story"
@@ -265,12 +269,12 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
               <p className={`text-sm leading-relaxed whitespace-pre-line mb-6 ${dark ? 'text-white/80' : 'text-[#3d3866]'}`}>
                 {story}
               </p>
- 
+
               {speechSupported && (
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   {!speaking ? (
                     <button onClick={speak} className="px-4 py-2 rounded-full text-xs font-medium bg-primary text-white">
-                      {t.storiesReadAloud}
+                      {t.readAloud}
                     </button>
                   ) : (
                     <>
@@ -278,13 +282,13 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
                         onClick={togglePause}
                         className={`px-4 py-2 rounded-full text-xs font-medium ${dark ? 'bg-white/10 text-white' : 'bg-[#eeecff] text-[#4a4570]'}`}
                       >
-                        {paused ? t.storiesResume : t.storiesPause}
+                        {paused ? t.resumeBtn : t.pauseBtn}
                       </button>
                       <button
                         onClick={stopSpeaking}
                         className={`px-4 py-2 rounded-full text-xs font-medium ${dark ? 'bg-white/10 text-white' : 'bg-[#eeecff] text-[#4a4570]'}`}
                       >
-                        {t.storiesStop}
+                        {t.stopBtn}
                       </button>
                     </>
                   )}
@@ -293,17 +297,17 @@ export default function StoriesPage({ onNavigate, page, dark, lang, t }: Stories
               {voiceWarning && (
                 <p className={`text-xs mb-4 ${dark ? 'text-white/40' : 'text-[#8a84b0]'}`}>{voiceWarning}</p>
               )}
- 
+
               <button onClick={reset} className={`text-xs font-medium ${dark ? 'text-white/50' : 'text-[#6b6690]'}`}>
-                {t.storiesAnother}
+                {t.anotherStory}
               </button>
             </motion.div>
           )}
         </AnimatePresence>
- 
+
         {error && <p className="mt-4 text-xs text-center text-danger">{error}</p>}
       </div>
- 
+
       <NavBar page={page} onNavigate={onNavigate} />
     </div>
   );
