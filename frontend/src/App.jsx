@@ -223,7 +223,21 @@ const T = {
     anotherStory: "← Another story",
     noVoiceWarning: (l) => `No ${l} voice is installed on this device, so this will read in English instead.`,
     storyGenError: "Eloria could not write a story right now",
-    
+    // English
+    supportTitle: "Support",
+    supportSubtitle: "Reaching out is a sign of strength, not a last resort.",
+    sosCrisisText: "In crisis right now? Call for help.",
+    tapToCall: "Tap to call",
+    dataPrivacyNote: "🔒 Your data is never used to train AI models.",
+    helplinesHeader: "Helplines",
+    helplinesSub: "Real, verified Indian helplines. You are not alone.",
+    orgsHeader: "Organisations",
+    orgsSub: "Offering free or affordable support.",
+    libraryTitle: "Library",
+    librarySubtitle: "Hand-picked books, articles, and podcasts for whenever you want to go deeper.",
+    tabBooks: "📚 Books", tabArticles: "📰 Articles", tabPodcasts: "🎧 Podcasts",
+    byAuthor: "by",
+
   },
   Tamil: {
     tagline: "உங்கள் குணமடையும் இடம்",
@@ -305,6 +319,21 @@ const T = {
     readAloud: "🔊 வாசி", pauseBtn: "⏸ இடைநிறுத்து", resumeBtn: "▶ தொடரவும்", stopBtn: "⏹ நிறுத்து",
     anotherStory: "← மற்றொரு கதை",
     storyGenError: "Eloria இப்போது ஒரு கதை எழுத முடியவில்லை",
+    // Tamil
+    supportTitle: "ஆதரவு",
+    supportSubtitle: "உதவி கேட்பது வலிமையின் அடையாளம், கடைசி வழி அல்ல.",
+    sosCrisisText: "இப்போது நெருக்கடியில் இருக்கிறீர்களா? உதவிக்கு அழையுங்கள்.",
+    tapToCall: "அழைக்க தட்டவும்",
+    dataPrivacyNote: "🔒 உங்கள் தரவு AI மாதிரிகளுக்கு பயிற்சி அளிக்க ஒருபோதும் பயன்படுத்தப்படாது.",
+    helplinesHeader: "உதவி எண்கள்",
+    helplinesSub: "உண்மையான, சரிபார்க்கப்பட்ட இந்திய உதவி எண்கள். நீங்கள் தனியாக இல்லை.",
+    orgsHeader: "அமைப்புகள்",
+    orgsSub: "இலவச அல்லது மலிவு விலையில் ஆதரவு அளிக்கின்றன.",
+    libraryTitle: "நூலகம்",
+    librarySubtitle: "நீங்கள் ஆழமாக செல்ல விரும்பும் போது தேர்ந்தெடுக்கப்பட்ட புத்தகங்கள், கட்டுரைகள் மற்றும் பாட்காஸ்ட்கள்.",
+    tabBooks: "📚 புத்தகங்கள்", tabArticles: "📰 கட்டுரைகள்", tabPodcasts: "🎧 பாட்காஸ்ட்கள்",
+    byAuthor: "எழுதியவர்",
+
   },
   Telugu: {
     tagline: "మీ స్వస్థత స్థలం",
@@ -386,6 +415,20 @@ const T = {
     readAloud: "🔊 చదవండి", pauseBtn: "⏸ ఆపు", resumeBtn: "▶ కొనసాగించు", stopBtn: "⏹ నిలిపివేయి",
     anotherStory: "← మరొక కథ",
     storyGenError: "Eloria ఇప్పుడు కథ రాయలేకపోయింది",
+    // Telugu
+    supportTitle: "మద్దతు",
+    supportSubtitle: "సహాయం అడగడం బలానికి సంకేతం, చివరి మార్గం కాదు.",
+    sosCrisisText: "ఇప్పుడు సంక్షోభంలో ఉన్నారా? సహాయం కోసం కాల్ చేయండి.",
+    tapToCall: "కాల్ చేయడానికి నొక్కండి",
+    dataPrivacyNote: "🔒 మీ డేటా AI మోడల్‌లకు శిక్షణ ఇవ్వడానికి ఎప్పుడూ ఉపయోగించబడదు.",
+    helplinesHeader: "హెల్ప్‌లైన్‌లు",
+    helplinesSub: "నిజమైన, ధృవీకరించబడిన భారతీయ హెల్ప్‌లైన్‌లు. మీరు ఒంటరిగా లేరు.",
+    orgsHeader: "సంస్థలు",
+    orgsSub: "ఉచిత లేదా సరసమైన మద్దతు అందిస్తున్నాయి.",
+    libraryTitle: "లైబ్రరీ",
+    librarySubtitle: "మీరు లోతుగా వెళ్లాలనుకున్నప్పుడు ప్రత్యేకంగా ఎంపిక చేసిన పుస్తకాలు, వ్యాసాలు మరియు పాడ్‌కాస్ట్‌లు.",
+    tabBooks: "📚 పుస్తకాలు", tabArticles: "📰 వ్యాసాలు", tabPodcasts: "🎧 పాడ్‌కాస్ట్‌లు",
+    byAuthor: "రచయిత",
 
   },
   Malayalam: {
@@ -468,6 +511,20 @@ const T = {
     readAloud: "🔊 വായിക്കൂ", pauseBtn: "⏸ താൽക്കാലികമായി നിർത്തൂ", resumeBtn: "▶ തുടരൂ", stopBtn: "⏹ നിർത്തൂ",
     anotherStory: "← മറ്റൊരു കഥ",
     storyGenError: "Eloria-ക്ക് ഇപ്പോൾ ഒരു കഥ എഴുതാൻ കഴിഞ്ഞില്ല",
+    // Malayalam
+    supportTitle: "പിന്തുണ",
+    supportSubtitle: "സഹായം തേടുന്നത് ശക്തിയുടെ അടയാളമാണ്, അവസാന വഴിയല്ല.",
+    sosCrisisText: "ഇപ്പോൾ പ്രതിസന്ധിയിലാണോ? സഹായത്തിന് വിളിക്കൂ.",
+    tapToCall: "വിളിക്കാൻ ടാപ്പ് ചെയ്യൂ",
+    dataPrivacyNote: "🔒 നിങ്ങളുടെ ഡാറ്റ AI മോഡലുകളെ പരിശീലിപ്പിക്കാൻ ഒരിക്കലും ഉപയോഗിക്കില്ല.",
+    helplinesHeader: "ഹെൽപ്‌ലൈനുകൾ",
+    helplinesSub: "യഥാർത്ഥ, സ്ഥിരീകരിച്ച ഇന്ത്യൻ ഹെൽപ്‌ലൈനുകൾ. നിങ്ങൾ ഒറ്റയ്ക്കല്ല.",
+    orgsHeader: "സംഘടനകൾ",
+    orgsSub: "സൗജന്യമോ താങ്ങാവുന്നതോ ആയ പിന്തുണ നൽകുന്നു.",
+    libraryTitle: "ലൈബ്രറി",
+    librarySubtitle: "നിങ്ങൾ കൂടുതൽ ആഴത്തിൽ പോകാൻ ആഗ്രഹിക്കുമ്പോൾ തിരഞ്ഞെടുത്ത പുസ്തകങ്ങൾ, ലേഖനങ്ങൾ, പോഡ്‌കാസ്റ്റുകൾ.",
+    tabBooks: "📚 പുസ്തകങ്ങൾ", tabArticles: "📰 ലേഖനങ്ങൾ", tabPodcasts: "🎧 പോഡ്‌കാസ്റ്റുകൾ",
+    byAuthor: "രചയിതാവ്",
 
   },
   Kannada: {
@@ -550,6 +607,20 @@ const T = {
     readAloud: "🔊 ಓದಿ", pauseBtn: "⏸ ವಿರಾಮ", resumeBtn: "▶ ಮುಂದುವರಿಸಿ", stopBtn: "⏹ ನಿಲ್ಲಿಸಿ",
     anotherStory: "← ಮತ್ತೊಂದು ಕಥೆ",
     storyGenError: "Eloria ಈಗ ಕಥೆ ಬರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
+    // Kannada
+    supportTitle: "ಬೆಂಬಲ",
+    supportSubtitle: "ಸಹಾಯ ಕೇಳುವುದು ಶಕ್ತಿಯ ಸಂಕೇತ, ಕೊನೆಯ ಮಾರ್ಗವಲ್ಲ.",
+    sosCrisisText: "ಈಗ ಬಿಕ್ಕಟ್ಟಿನಲ್ಲಿದ್ದೀರಾ? ಸಹಾಯಕ್ಕಾಗಿ ಕರೆ ಮಾಡಿ.",
+    tapToCall: "ಕರೆ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ",
+    dataPrivacyNote: "🔒 ನಿಮ್ಮ ಡೇಟಾವನ್ನು AI ಮಾದರಿಗಳಿಗೆ ತರಬೇತಿ ನೀಡಲು ಎಂದಿಗೂ ಬಳಸಲಾಗುವುದಿಲ್ಲ.",
+    helplinesHeader: "ಸಹಾಯವಾಣಿಗಳು",
+    helplinesSub: "ನಿಜವಾದ, ಪರಿಶೀಲಿಸಿದ ಭಾರತೀಯ ಸಹಾಯವಾಣಿಗಳು. ನೀವು ಒಂಟಿಯಾಗಿಲ್ಲ.",
+    orgsHeader: "ಸಂಸ್ಥೆಗಳು",
+    orgsSub: "ಉಚಿತ ಅಥವಾ ಕೈಗೆಟುಕುವ ಬೆಂಬಲ ನೀಡುತ್ತಿವೆ.",
+    libraryTitle: "ಗ್ರಂಥಾಲಯ",
+    librarySubtitle: "ನೀವು ಆಳವಾಗಿ ಹೋಗಲು ಬಯಸಿದಾಗ ಆಯ್ಕೆಮಾಡಿದ ಪುಸ್ತಕಗಳು, ಲೇಖನಗಳು ಮತ್ತು ಪಾಡ್‌ಕಾಸ್ಟ್‌ಗಳು.",
+    tabBooks: "📚 ಪುಸ್ತಕಗಳು", tabArticles: "📰 ಲೇಖನಗಳು", tabPodcasts: "🎧 ಪಾಡ್‌ಕಾಸ್ಟ್‌ಗಳು",
+    byAuthor: "ಲೇಖಕ",
 
   },
   Hindi: {
@@ -632,7 +703,21 @@ const T = {
     readAloud: "🔊 पढ़कर सुनाएं", pauseBtn: "⏸ रोकें", resumeBtn: "▶ जारी रखें", stopBtn: "⏹ बंद करें",
     anotherStory: "← एक और कहानी",
     storyGenError: "Eloria अभी कहानी नहीं लिख सकी",
-
+    // Hindi
+    supportTitle: "सहायता",
+    supportSubtitle: "मदद माँगना ताकत की निशानी है, आखिरी रास्ता नहीं।",
+    sosCrisisText: "अभी संकट में हैं? मदद के लिए कॉल करें।",
+    tapToCall: "कॉल करने के लिए टैप करें",
+    dataPrivacyNote: "🔒 आपका डेटा कभी भी AI मॉडल को प्रशिक्षित करने के लिए उपयोग नहीं किया जाता।",
+    helplinesHeader: "हेल्पलाइन",
+    helplinesSub: "वास्तविक, सत्यापित भारतीय हेल्पलाइन। आप अकेले नहीं हैं।",
+    orgsHeader: "संगठन",
+    orgsSub: "मुफ्त या किफायती सहायता प्रदान करते हैं।",
+    libraryTitle: "लाइब्रेरी",
+    librarySubtitle: "जब भी आप गहराई में जाना चाहें, चुनी हुई किताबें, लेख और पॉडकास्ट।",
+    tabBooks: "📚 किताबें", tabArticles: "📰 लेख", tabPodcasts: "🎧 पॉडकास्ट",
+    byAuthor: "लेखक",
+    
   },
 }
 
@@ -1617,8 +1702,8 @@ export default function App() {
       {page === "checkin"  && <CheckInPage onNavigate={navigate} t={t} onMoodSet={handleMoodSet} />}
       {page === "history"  && <HistoryPage t={t} />}
       {page === "chat"     && <ChatPage t={t} lang={lang} />}
-      {page === "support"  && <SupportPage onNavigate={navigate} page={page} dark={dark} />}
-      {page === "library"  && <LibraryPage onNavigate={navigate} page={page} dark={dark} />}
+      {page === "support" && <SupportPage onNavigate={navigate} page={page} dark={dark} t={t} />}
+      {page === "library" && <LibraryPage onNavigate={navigate} page={page} dark={dark} t={t} />}
       {page === "stories" && <StoriesPage onNavigate={navigate} page={page} dark={dark} lang={lang} t={t} />}
       {page === "tree"     && <HavenTreePage onNavigate={navigate} page={page} dark={dark} />}
       {page === "trends"   && <TrendsPage t={t} />}

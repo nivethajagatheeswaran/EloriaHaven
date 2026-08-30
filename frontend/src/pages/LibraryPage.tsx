@@ -1,3 +1,4 @@
+// LibraryPage.tsx
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavBar from '../components/NavBar';
@@ -6,9 +7,16 @@ interface LibraryPageProps {
   onNavigate: (page: string) => void;
   page: string;
   dark: boolean;
+  t: any;
 }
 
 type Tab = 'books' | 'articles' | 'podcasts';
+
+// Book/podcast links use platform search URLs rather than guessed direct
+// product/show pages — this guarantees a working, correct destination
+// instead of risking a stale or mistaken direct link.
+const amazonSearch = (query: string) => `https://www.amazon.in/s?k=${encodeURIComponent(query)}`;
+const spotifySearch = (query: string) => `https://open.spotify.com/search/${encodeURIComponent(query)}`;
 
 const BOOKS = [
   { title: 'The Body Keeps the Score', author: 'Bessel van der Kolk', emoji: '📖', desc: 'How trauma reshapes the body and mind' },
@@ -17,7 +25,7 @@ const BOOKS = [
   { title: "Man's Search for Meaning", author: 'Viktor Frankl', emoji: '📙', desc: 'Finding purpose through survival and reflection' },
   { title: 'The Midnight Library', author: 'Matt Haig', emoji: '📕', desc: 'A gentle novel about regret and possibility' },
   { title: 'Maybe You Should Talk to Someone', author: 'Lori Gottlieb', emoji: '📔', desc: 'A therapist on therapy, from both sides of the couch' },
-];
+].map((b) => ({ ...b, url: amazonSearch(`${b.title} ${b.author} book`) }));
 
 const ARTICLES = [
   {
@@ -58,9 +66,9 @@ const PODCASTS = [
   { title: 'HealthyGamerGG', host: 'Dr. Alok Kanojia', emoji: '🎮', desc: 'Mental health through the lens of student and gaming culture' },
   { title: 'Ten Percent Happier', host: 'Dan Harris', emoji: '🧘', desc: 'Meditation and mental health for skeptics' },
   { title: 'On Purpose', host: 'Jay Shetty', emoji: '💭', desc: 'Conversations on purpose, mindset, and emotional resilience' },
-];
+].map((p) => ({ ...p, url: spotifySearch(p.title) }));
 
-export default function LibraryPage({ onNavigate, page, dark }: LibraryPageProps) {
+export default function LibraryPage({ onNavigate, page, dark, t }: LibraryPageProps) {
   const [tab, setTab] = useState<Tab>('books');
 
   const cardBase = dark
@@ -80,10 +88,10 @@ export default function LibraryPage({ onNavigate, page, dark }: LibraryPageProps
           className="mb-8"
         >
           <h1 className={`text-2xl font-medium tracking-tight ${dark ? 'text-white' : 'text-[#2d2a4a]'}`}>
-            Library
+            {t.libraryTitle}
           </h1>
           <p className={`mt-2 text-sm ${dark ? 'text-white/50' : 'text-[#6b6690]'}`}>
-            Hand-picked books, articles, and podcasts for whenever you want to go deeper.
+            {t.librarySubtitle}
           </p>
         </motion.div>
 
@@ -101,7 +109,7 @@ export default function LibraryPage({ onNavigate, page, dark }: LibraryPageProps
                   : 'bg-white/60 text-[#6b6690] border border-white/50'
               }`}
             >
-              {tb === 'books' ? '📚 Books' : tb === 'articles' ? '📰 Articles' : '🎧 Podcasts'}
+              {tb === 'books' ? t.tabBooks : tb === 'articles' ? t.tabArticles : t.tabPodcasts}
             </button>
           ))}
         </div>
@@ -117,14 +125,20 @@ export default function LibraryPage({ onNavigate, page, dark }: LibraryPageProps
               className="flex flex-col gap-3"
             >
               {BOOKS.map((b) => (
-                <div key={b.title} className={`rounded-2xl px-4 py-3 flex gap-3 items-start ${cardBase}`}>
+                <a
+                  key={b.title}
+                  href={b.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-2xl px-4 py-3 flex gap-3 items-start ${cardBase}`}
+                >
                   <span className="text-2xl shrink-0">{b.emoji}</span>
                   <div>
                     <div className={`text-sm font-medium ${dark ? 'text-white' : 'text-[#2d2a4a]'}`}>{b.title}</div>
-                    <div className={`text-xs mt-0.5 ${dark ? 'text-white/50' : 'text-[#8a84b0]'}`}>by {b.author}</div>
+                    <div className={`text-xs mt-0.5 ${dark ? 'text-white/50' : 'text-[#8a84b0]'}`}>{t.byAuthor} {b.author}</div>
                     <div className={`text-xs mt-1 ${dark ? 'text-white/60' : 'text-[#6b6690]'}`}>{b.desc}</div>
                   </div>
-                </div>
+                </a>
               ))}
             </motion.div>
           )}
@@ -164,14 +178,20 @@ export default function LibraryPage({ onNavigate, page, dark }: LibraryPageProps
               className="flex flex-col gap-3"
             >
               {PODCASTS.map((p) => (
-                <div key={p.title} className={`rounded-2xl px-4 py-3 flex gap-3 items-start ${cardBase}`}>
+                <a
+                  key={p.title}
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-2xl px-4 py-3 flex gap-3 items-start ${cardBase}`}
+                >
                   <span className="text-2xl shrink-0">{p.emoji}</span>
                   <div>
                     <div className={`text-sm font-medium ${dark ? 'text-white' : 'text-[#2d2a4a]'}`}>{p.title}</div>
                     <div className={`text-xs mt-0.5 ${dark ? 'text-white/50' : 'text-[#8a84b0]'}`}>{p.host}</div>
                     <div className={`text-xs mt-1 ${dark ? 'text-white/60' : 'text-[#6b6690]'}`}>{p.desc}</div>
                   </div>
-                </div>
+                </a>
               ))}
             </motion.div>
           )}

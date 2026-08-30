@@ -1,3 +1,4 @@
+// SupportPage.tsx
 import { motion } from 'framer-motion';
 import NavBar from '../components/NavBar';
 
@@ -5,6 +6,7 @@ interface SupportPageProps {
   onNavigate: (page: string) => void;
   page: string;
   dark: boolean;
+  t: any;
 }
 
 const HELPLINES = [
@@ -26,7 +28,7 @@ const NGOS = [
 // Primary crisis line, surfaced most prominently in the SOS card.
 const PRIMARY_CRISIS_LINE = HELPLINES[0];
 
-export default function SupportPage({ onNavigate, page, dark }: SupportPageProps) {
+export default function SupportPage({ onNavigate, page, dark, t }: SupportPageProps) {
   return (
     <div
       className={`min-h-screen w-full transition-colors duration-700 ${dark ? 'bg-[#1a1830]' : ''}`}
@@ -40,10 +42,10 @@ export default function SupportPage({ onNavigate, page, dark }: SupportPageProps
           className="mb-8 text-center"
         >
           <h1 className={`text-2xl font-medium tracking-tight ${dark ? 'text-white' : 'text-[#2d2a4a]'}`}>
-            Support
+            {t.supportTitle}
           </h1>
           <p className={`mt-2 text-sm ${dark ? 'text-white/50' : 'text-[#6b6690]'}`}>
-            Reaching out is a sign of strength, not a last resort.
+            {t.supportSubtitle}
           </p>
         </motion.div>
 
@@ -61,9 +63,9 @@ export default function SupportPage({ onNavigate, page, dark }: SupportPageProps
           }}
         >
           <div className="text-3xl mb-2">🆘</div>
-          <div className="text-white text-base font-medium mb-1">In crisis right now? Call for help.</div>
+          <div className="text-white text-base font-medium mb-1">{t.sosCrisisText}</div>
           <div className="text-white/85 text-sm">
-            Tap to call {PRIMARY_CRISIS_LINE.name} · {PRIMARY_CRISIS_LINE.number}
+            {t.tapToCall} {PRIMARY_CRISIS_LINE.name} · {PRIMARY_CRISIS_LINE.number}
           </div>
         </motion.a>
 
@@ -72,16 +74,16 @@ export default function SupportPage({ onNavigate, page, dark }: SupportPageProps
             dark ? 'bg-white/[0.06] text-white/50 border border-white/10' : 'bg-white/60 text-[#8a84b0] border border-white/50'
           }`}
         >
-          🔒 Your data is never used to train AI models.
+          {t.dataPrivacyNote}
         </div>
 
         {/* Helplines */}
         <div className="mb-8">
           <h2 className={`text-xs font-medium uppercase tracking-wide mb-3 ${dark ? 'text-white/40' : 'text-[#8a84b0]'}`}>
-            Helplines
+            {t.helplinesHeader}
           </h2>
           <p className={`text-xs mb-4 ${dark ? 'text-white/40' : 'text-[#8a84b0]'}`}>
-            Real, verified Indian helplines. You are not alone.
+            {t.helplinesSub}
           </p>
           <div className="flex flex-col gap-3">
             {HELPLINES.map((h, i) => (
@@ -111,10 +113,10 @@ export default function SupportPage({ onNavigate, page, dark }: SupportPageProps
         {/* NGOs */}
         <div>
           <h2 className={`text-xs font-medium uppercase tracking-wide mb-3 ${dark ? 'text-white/40' : 'text-[#8a84b0]'}`}>
-            Organisations
+            {t.orgsHeader}
           </h2>
           <p className={`text-xs mb-4 ${dark ? 'text-white/40' : 'text-[#8a84b0]'}`}>
-            Offering free or affordable support.
+            {t.orgsSub}
           </p>
           <div className="flex flex-col gap-3">
             {NGOS.map((n, i) => (
